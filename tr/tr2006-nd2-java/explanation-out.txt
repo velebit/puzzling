@@ -1,0 +1,243 @@
+***** A: 10, B: 50, C: 60 *****
+C sees numbers 10 and 50.
+C knows that their own hat has to be 40 or 60.
+If C's hat was 40, then:
+    B would see numbers 10 and 40.
+    B would know that their own hat has to be 30 or 50.
+    If B's hat was 30, then:
+        C would see numbers 10 and 30.
+        C would know that their own hat has to be 20 or 40.
+        If C's hat was 20, then:
+            B would see numbers 10 and 20.
+            B would know that their own hat has to be 10 or 30.
+            If B's hat was 10, then:
+                C would see numbers 10 and 10.
+                C would know that their own hat has to be 20 (it can't be 0).
+                C would guess 20 in round 1.
+            But C didn't guess 20 in round 1.
+            So B would have known their own hat isn't 10.
+            B would guess 30 in round 2.
+        But B didn't guess 30 in round 2.
+        So C would have known their own hat isn't 20.
+        C would guess 40 in round 2.
+    But C didn't guess 40 in round 2.
+    So B would have known their own hat isn't 30.
+    B would guess 50 in round 3.
+But B didn't guess 50 in round 3.
+So C knows their own hat isn't 40.
+C is able to guess 60 in round 3.
+
+***** A: 50, B: 10, C: 60 *****
+C sees numbers 50 and 10.
+C knows that their own hat has to be 40 or 60.
+If C's hat was 40, then:
+    A would see numbers 10 and 40.
+    A would know that their own hat has to be 30 or 50.
+    If A's hat was 30, then:
+        C would see numbers 30 and 10.
+        C would know that their own hat has to be 20 or 40.
+        If C's hat was 20, then:
+            A would see numbers 10 and 20.
+            A would know that their own hat has to be 10 or 30.
+            If A's hat was 10, then:
+                C would see numbers 10 and 10.
+                C would know that their own hat has to be 20 (it can't be 0).
+                C would guess 20 in round 1.
+            But C didn't guess 20 in round 1.
+            So A would have known their own hat isn't 10.
+            A would guess 30 in round 2.
+        But A didn't guess 30 in round 2.
+        So C would have known their own hat isn't 20.
+        C would guess 40 in round 2.
+    But C didn't guess 40 in round 2.
+    So A would have known their own hat isn't 30.
+    A would guess 50 in round 3.
+But A didn't guess 50 in round 3.
+So C knows their own hat isn't 40.
+C is able to guess 60 in round 3.
+
+***** A: 16, B: 44, C: 60 *****
+C sees numbers 16 and 44.
+C knows that their own hat has to be 28 or 60.
+If C's hat was 28, then:
+    B would see numbers 16 and 28.
+    B would know that their own hat has to be 12 or 44.
+    If B's hat was 12, then:
+        C would see numbers 16 and 12.
+        C would know that their own hat has to be 4 or 28.
+        If C's hat was 4, then:
+            A would see numbers 12 and 4.
+            A would know that their own hat has to be 8 or 16.
+            If A's hat was 8, then:
+                B would see numbers 8 and 4.
+                B would know that their own hat has to be 4 or 12.
+                If B's hat was 4, then:
+                    A would see numbers 4 and 4.
+                    A would know that their own hat has to be 8 (it can't be 0).
+                    A would guess 8 in round 1.
+                But A didn't guess 8 in round 1.
+                So B would have known their own hat isn't 4.
+                B would guess 12 in round 1.
+            But B didn't guess 12 in round 1.
+            So A would have known their own hat isn't 8.
+            A would guess 16 in round 2.
+        But A didn't guess 16 in round 2.
+        So C would have known their own hat isn't 4.
+        C would guess 28 in round 2.
+    But C didn't guess 28 in round 2.
+    So B would have known their own hat isn't 12.
+    B would guess 44 in round 3.
+But B didn't guess 44 in round 3.
+So C knows their own hat isn't 28.
+C is able to guess 60 in round 3.
+
+***** A: 44, B: 16, C: 60 *****
+C sees numbers 44 and 16.
+C knows that their own hat has to be 28 or 60.
+If C's hat was 28, then:
+    A would see numbers 16 and 28.
+    A would know that their own hat has to be 12 or 44.
+    If A's hat was 12, then:
+        C would see numbers 12 and 16.
+        C would know that their own hat has to be 4 or 28.
+        If C's hat was 4, then:
+            B would see numbers 12 and 4.
+            B would know that their own hat has to be 8 or 16.
+            If B's hat was 8, then:
+                A would see numbers 8 and 4.
+                A would know that their own hat has to be 4 or 12.
+                If A's hat was 4, then:
+                    B would see numbers 4 and 4.
+                    B would know that their own hat has to be 8 (it can't be 0).
+                    B would guess 8 in round 1.
+                But B didn't guess 8 in round 1.
+                So A would have known their own hat isn't 4.
+                A would guess 12 in round 2.
+            But A didn't guess 12 in round 2.
+            So B would have known their own hat isn't 8.
+            B would guess 16 in round 2.
+        But B didn't guess 16 in round 2.
+        So C would have known their own hat isn't 4.
+        C would guess 28 in round 2.
+    But C didn't guess 28 in round 2.
+    So A would have known their own hat isn't 12.
+    A would guess 44 in round 3.
+But A didn't guess 44 in round 3.
+So C knows their own hat isn't 28.
+C is able to guess 60 in round 3.
+
+***** A: 18, B: 42, C: 60 *****
+C sees numbers 18 and 42.
+C knows that their own hat has to be 24 or 60.
+If C's hat was 24, then:
+    B would see numbers 18 and 24.
+    B would know that their own hat has to be 6 or 42.
+    If B's hat was 6, then:
+        C would see numbers 18 and 6.
+        C would know that their own hat has to be 12 or 24.
+        If C's hat was 12, then:
+            A would see numbers 6 and 12.
+            A would know that their own hat has to be 6 or 18.
+            If A's hat was 6, then:
+                C would see numbers 6 and 6.
+                C would know that their own hat has to be 12 (it can't be 0).
+                C would guess 12 in round 1.
+            But C didn't guess 12 in round 1.
+            So A would have known their own hat isn't 6.
+            A would guess 18 in round 2.
+        But A didn't guess 18 in round 2.
+        So C would have known their own hat isn't 12.
+        C would guess 24 in round 2.
+    But C didn't guess 24 in round 2.
+    So B would have known their own hat isn't 6.
+    B would guess 42 in round 3.
+But B didn't guess 42 in round 3.
+So C knows their own hat isn't 24.
+C is able to guess 60 in round 3.
+
+***** A: 42, B: 18, C: 60 *****
+C sees numbers 42 and 18.
+C knows that their own hat has to be 24 or 60.
+If C's hat was 24, then:
+    A would see numbers 18 and 24.
+    A would know that their own hat has to be 6 or 42.
+    If A's hat was 6, then:
+        C would see numbers 6 and 18.
+        C would know that their own hat has to be 12 or 24.
+        If C's hat was 12, then:
+            B would see numbers 6 and 12.
+            B would know that their own hat has to be 6 or 18.
+            If B's hat was 6, then:
+                C would see numbers 6 and 6.
+                C would know that their own hat has to be 12 (it can't be 0).
+                C would guess 12 in round 1.
+            But C didn't guess 12 in round 1.
+            So B would have known their own hat isn't 6.
+            B would guess 18 in round 2.
+        But B didn't guess 18 in round 2.
+        So C would have known their own hat isn't 12.
+        C would guess 24 in round 2.
+    But C didn't guess 24 in round 2.
+    So A would have known their own hat isn't 6.
+    A would guess 42 in round 3.
+But A didn't guess 42 in round 3.
+So C knows their own hat isn't 24.
+C is able to guess 60 in round 3.
+
+***** A: 25, B: 35, C: 60 *****
+C sees numbers 25 and 35.
+C knows that their own hat has to be 10 or 60.
+If C's hat was 10, then:
+    B would see numbers 25 and 10.
+    B would know that their own hat has to be 15 or 35.
+    If B's hat was 15, then:
+        A would see numbers 15 and 10.
+        A would know that their own hat has to be 5 or 25.
+        If A's hat was 5, then:
+            B would see numbers 5 and 10.
+            B would know that their own hat has to be 5 or 15.
+            If B's hat was 5, then:
+                C would see numbers 5 and 5.
+                C would know that their own hat has to be 10 (it can't be 0).
+                C would guess 10 in round 1.
+            But C didn't guess 10 in round 1.
+            So B would have known their own hat isn't 5.
+            B would guess 15 in round 2.
+        But B didn't guess 15 in round 2.
+        So A would have known their own hat isn't 5.
+        A would guess 25 in round 3.
+    But A didn't guess 25 in round 3.
+    So B would have known their own hat isn't 15.
+    B would guess 35 in round 3.
+But B didn't guess 35 in round 3.
+So C knows their own hat isn't 10.
+C is able to guess 60 in round 3.
+
+***** A: 35, B: 25, C: 60 *****
+C sees numbers 35 and 25.
+C knows that their own hat has to be 10 or 60.
+If C's hat was 10, then:
+    A would see numbers 25 and 10.
+    A would know that their own hat has to be 15 or 35.
+    If A's hat was 15, then:
+        B would see numbers 15 and 10.
+        B would know that their own hat has to be 5 or 25.
+        If B's hat was 5, then:
+            A would see numbers 5 and 10.
+            A would know that their own hat has to be 5 or 15.
+            If A's hat was 5, then:
+                C would see numbers 5 and 5.
+                C would know that their own hat has to be 10 (it can't be 0).
+                C would guess 10 in round 1.
+            But C didn't guess 10 in round 1.
+            So A would have known their own hat isn't 5.
+            A would guess 15 in round 2.
+        But A didn't guess 15 in round 2.
+        So B would have known their own hat isn't 5.
+        B would guess 25 in round 2.
+    But B didn't guess 25 in round 2.
+    So A would have known their own hat isn't 15.
+    A would guess 35 in round 3.
+But A didn't guess 35 in round 3.
+So C knows their own hat isn't 10.
+C is able to guess 60 in round 3.

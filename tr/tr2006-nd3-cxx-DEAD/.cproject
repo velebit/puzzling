@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?fileVersion 4.0.0?>
+
+<cproject>
+<storageModule moduleId="org.eclipse.cdt.core.settings">
+<cconfiguration id="cdt.managedbuild.config.gnu.cygwin.exe.debug.1851776792">
+<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.gnu.cygwin.exe.debug.1851776792" moduleId="org.eclipse.cdt.core.settings" name="Debug">
+<externalSettings/>
+<extensions>
+<extension id="org.eclipse.cdt.core.Cygwin_PE" point="org.eclipse.cdt.core.BinaryParser"/>
+<extension id="org.eclipse.cdt.core.MakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+</extensions>
+</storageModule>
+<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+<configuration artifactExtension="exe" artifactName="puzz-2006-nd3" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug,org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe" cleanCommand="rm -rf" description="" errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser" id="cdt.managedbuild.config.gnu.cygwin.exe.debug.1851776792" name="Debug" parent="cdt.managedbuild.config.gnu.cygwin.exe.debug">
+<folderInfo id="cdt.managedbuild.config.gnu.cygwin.exe.debug.1851776792.1823410278" name="/" resourcePath="">
+<toolChain id="cdt.managedbuild.toolchain.gnu.cygwin.exe.debug.1539890358" name="GCC Tool Chain" superClass="cdt.managedbuild.toolchain.gnu.cygwin.exe.debug">
+<targetPlatform id="cdt.managedbuild.target.gnu.platform.cygwin.exe.debug.639010073" name="Debug Platform" superClass="cdt.managedbuild.target.gnu.platform.cygwin.exe.debug"/>
+<builder buildPath="${workspace_loc:/puzz-2006-nd3-cxx-DEAD/Debug}" id="cdt.managedbuild.target.gnu.builder.cygwin.exe.debug.1195619464" name="Gnu Make Builder.Debug" superClass="cdt.managedbuild.target.gnu.builder.cygwin.exe.debug"/>
+<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.cygwin.exe.debug.1793811545" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.cygwin.exe.debug">
+<option id="gnu.cpp.compiler.cygwin.exe.debug.option.optimization.level.70111713" superClass="gnu.cpp.compiler.cygwin.exe.debug.option.optimization.level" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
+<option id="gnu.cpp.compiler.cygwin.exe.debug.option.debugging.level.723077346" superClass="gnu.cpp.compiler.cygwin.exe.debug.option.debugging.level" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
+</tool>
+<tool id="cdt.managedbuild.tool.gnu.c.compiler.cygwin.exe.debug.637269340" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.cygwin.exe.debug">
+<option defaultValue="gnu.c.optimization.level.none" id="gnu.c.compiler.cygwin.exe.debug.option.optimization.level.145174591" superClass="gnu.c.compiler.cygwin.exe.debug.option.optimization.level" valueType="enumerated"/>
+<option id="gnu.c.compiler.cygwin.exe.debug.option.debugging.level.228000920" superClass="gnu.c.compiler.cygwin.exe.debug.option.debugging.level" value="gnu.c.debugging.level.max" valueType="enumerated"/>
+</tool>
+<tool id="cdt.managedbuild.tool.gnu.c.linker.cygwin.exe.debug.64836403" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.cygwin.exe.debug"/>
+<tool id="cdt.managedbuild.tool.gnu.cpp.linker.cygwin.exe.debug.1200046047" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.cygwin.exe.debug"/>
+<tool id="cdt.managedbuild.tool.gnu.assembler.cygwin.exe.debug.1393378671" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.cygwin.exe.debug"/>
+<tool id="cdt.managedbuild.tool.gnu.archiver.cygwin.base.838500529" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.cygwin.base"/>
+</toolChain>
+</folderInfo>
+</configuration>
+</storageModule>
+</cconfiguration>
+<cconfiguration id="cdt.managedbuild.config.gnu.cygwin.exe.release.771362661">
+<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.gnu.cygwin.exe.release.771362661" moduleId="org.eclipse.cdt.core.settings" name="Release">
+<externalSettings/>
+<extensions>
+<extension id="org.eclipse.cdt.core.Cygwin_PE" point="org.eclipse.cdt.core.BinaryParser"/>
+<extension id="org.eclipse.cdt.core.MakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+</extensions>
+</storageModule>
+<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+<configuration artifactExtension="exe" artifactName="puzz-2006-nd3" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release,org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe" cleanCommand="rm -rf" description="" errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser" id="cdt.managedbuild.config.gnu.cygwin.exe.release.771362661" name="Release" parent="cdt.managedbuild.config.gnu.cygwin.exe.release">
+<folderInfo id="cdt.managedbuild.config.gnu.cygwin.exe.release.771362661.637910681" name="/" resourcePath="">
+<toolChain id="cdt.managedbuild.toolchain.gnu.cygwin.exe.release.571809279" name="GCC Tool Chain" superClass="cdt.managedbuild.toolchain.gnu.cygwin.exe.release">
+<targetPlatform id="cdt.managedbuild.target.gnu.platform.cygwin.exe.release.1800277567" name="Debug Platform" superClass="cdt.managedbuild.target.gnu.platform.cygwin.exe.release"/>
+<builder buildPath="${workspace_loc:/puzz-2006-nd3-cxx-DEAD/Release}" id="cdt.managedbuild.target.gnu.builder.cygwin.exe.release.1687049061" name="Gnu Make Builder.Release" superClass="cdt.managedbuild.target.gnu.builder.cygwin.exe.release"/>
+<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.cygwin.exe.release.1909594400" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.cygwin.exe.release">
+<option id="gnu.cpp.compiler.cygwin.exe.release.option.optimization.level.849649755" superClass="gnu.cpp.compiler.cygwin.exe.release.option.optimization.level" value="gnu.cpp.compiler.optimization.level.most" valueType="enumerated"/>
+<option id="gnu.cpp.compiler.cygwin.exe.release.option.debugging.level.1728732504" superClass="gnu.cpp.compiler.cygwin.exe.release.option.debugging.level" value="gnu.cpp.compiler.debugging.level.none" valueType="enumerated"/>
+</tool>
+<tool id="cdt.managedbuild.tool.gnu.c.compiler.cygwin.exe.release.725458094" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.cygwin.exe.release">
+<option defaultValue="gnu.c.optimization.level.most" id="gnu.c.compiler.cygwin.exe.release.option.optimization.level.207125235" superClass="gnu.c.compiler.cygwin.exe.release.option.optimization.level" valueType="enumerated"/>
+<option id="gnu.c.compiler.cygwin.exe.release.option.debugging.level.120413730" superClass="gnu.c.compiler.cygwin.exe.release.option.debugging.level" value="gnu.c.debugging.level.none" valueType="enumerated"/>
+</tool>
+<tool id="cdt.managedbuild.tool.gnu.c.linker.cygwin.exe.release.296850849" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.cygwin.exe.release"/>
+<tool id="cdt.managedbuild.tool.gnu.cpp.linker.cygwin.exe.release.928457448" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.cygwin.exe.release"/>
+<tool id="cdt.managedbuild.tool.gnu.assembler.cygwin.exe.release.1340831056" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.cygwin.exe.release"/>
+<tool id="cdt.managedbuild.tool.gnu.archiver.cygwin.base.1728906623" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.cygwin.base"/>
+</toolChain>
+</folderInfo>
+</configuration>
+</storageModule>
+</cconfiguration>
+</storageModule>
+<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+<project id="puzz-2006-nd3.cdt.managedbuild.target.gnu.cygwin.exe.1290345201" name="Executable (Gnu on Windows)" projectType="cdt.managedbuild.target.gnu.cygwin.exe"/>
+</storageModule>
+</cproject>

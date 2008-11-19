@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?fileVersion 3.1.0?>
+
+<ManagedProjectBuildInfo>
+<project id="puzz-2006-nd3.cdt.managedbuild.target.gnu.cygwin.exe.1290345201" name="Executable (Gnu on Windows)" projectType="cdt.managedbuild.target.gnu.cygwin.exe">
+<configuration artifactExtension="exe" artifactName="puzz-2006-nd3" cleanCommand="rm -rf" description="" errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser" id="cdt.managedbuild.config.gnu.cygwin.exe.debug.1851776792" name="Debug" parent="cdt.managedbuild.config.gnu.cygwin.exe.debug">
+<toolChain id="cdt.managedbuild.toolchain.gnu.cygwin.exe.debug.1539890358" name="GCC Tool Chain" superClass="cdt.managedbuild.toolchain.gnu.cygwin.exe.debug">
+<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.cygwin.exe.debug.1793811545" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.cygwin.exe.debug"/>
+<tool id="cdt.managedbuild.tool.gnu.c.compiler.cygwin.exe.debug.637269340" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.cygwin.exe.debug"/>
+<tool id="cdt.managedbuild.tool.gnu.c.linker.cygwin.exe.debug.64836403" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.cygwin.exe.debug"/>
+<tool id="cdt.managedbuild.tool.gnu.cpp.linker.cygwin.exe.debug.1200046047" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.cygwin.exe.debug"/>
+<tool id="cdt.managedbuild.tool.gnu.assembler.cygwin.exe.debug.1393378671" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.cygwin.exe.debug"/>
+</toolChain>
+</configuration>
+<configuration artifactExtension="exe" artifactName="puzz-2006-nd3" cleanCommand="rm -rf" description="" errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser" id="cdt.managedbuild.config.gnu.cygwin.exe.release.771362661" name="Release" parent="cdt.managedbuild.config.gnu.cygwin.exe.release">
+<toolChain id="cdt.managedbuild.toolchain.gnu.cygwin.exe.release.571809279" name="GCC Tool Chain" superClass="cdt.managedbuild.toolchain.gnu.cygwin.exe.release">
+<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.cygwin.exe.release.1909594400" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.cygwin.exe.release"/>
+<tool id="cdt.managedbuild.tool.gnu.c.compiler.cygwin.exe.release.725458094" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.cygwin.exe.release"/>
+<tool id="cdt.managedbuild.tool.gnu.c.linker.cygwin.exe.release.296850849" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.cygwin.exe.release"/>
+<tool id="cdt.managedbuild.tool.gnu.cpp.linker.cygwin.exe.release.928457448" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.cygwin.exe.release"/>
+<tool id="cdt.managedbuild.tool.gnu.assembler.cygwin.exe.release.1340831056" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.cygwin.exe.release"/>
+</toolChain>
+</configuration>
+</project>
+</ManagedProjectBuildInfo>

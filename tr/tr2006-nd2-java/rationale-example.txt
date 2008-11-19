@@ -1,0 +1,27 @@
+C sees numbers 10 and 50.
+C knows that their own hat has to be 40 or 60.
+If C's hat was 40, then:
+    B would see numbers 10 and 40.
+    B would know that their own hat has to be 30 or 50.
+    If B's hat was 30, then:
+        C would see numbers 10 and 30.
+        C would know that their own hat has to be 20 or 40.
+	    If C's hat was 20, then:
+            B would see numbers 10 and 20.
+            B would know that their own hat has to be 10 or 30.
+            If B's hat was 10, then:
+                C would see numbers 10 and 10.
+                C would know that their own hat has to be 20.
+                C would guess 20 in round 1.
+            But C didn't guess 20 in round 1.
+            So B would have known their own hat isn't 10.
+            B would guess 30 in round 2.
+        But B didn't guess 30 in round 2.
+        So C would have known their own hat isn't 20.
+        C would guess 40 in round 2.
+    But C didn't guess 40 in round 2.
+    So B would have known their own hat isn't 30.
+    B would guess 50 in round 3.
+But B didn't guess 50 in round 3.
+So C knows their own hat isn't 40.
+C can guess 60 in round 3.

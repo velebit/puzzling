@@ -39,6 +39,7 @@ clean:
 	rm -f $(OBJDIR)/* *.stackdump core.* $(BINARIES)
 veryclean: clean
 	rm -f *~ .*~ deps/* objs/*/* $(BIN_NAMES:%=%.exe) $(BIN_NAMES)
+	rmdir deps objs/* && rmdir objs
 %.dir:
 	@if [ ! -e $* ]; then echo mkdir -p $*; mkdir -p $*; fi
 .PHONY: default all clean veryclean %.dir

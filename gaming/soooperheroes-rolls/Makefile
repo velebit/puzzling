@@ -39,19 +39,19 @@ clean:
 	rm -f $(OBJDIR)/* *.stackdump core.* $(BINARIES)
 veryclean: clean
 	rm -f *~ .*~ deps/* objs/*/* $(BIN_NAMES:%=%.exe) $(BIN_NAMES)
-	rmdir deps objs/* && rmdir objs
+	find deps objs -depth | xargs rm -rf
 %.dir:
 	@if [ ! -e $* ]; then echo mkdir -p $*; mkdir -p $*; fi
 .PHONY: default all clean veryclean %.dir
 
 .SECONDEXPANSION:
 ## The second expansion makes it easy to specify extra objects for each binary:
-OBJS_test_fact := \
-	$(patsubst %,$(OBJDIR)/%.o, factorial factorial_Cache )
-OBJS_test_unordered := \
-	$(patsubst %,$(OBJDIR)/%.o, factorial factorial_Cache UnorderedRoll )
-OBJS_soooperheroes_rolls := \
-	$(patsubst %,$(OBJDIR)/%.o, factorial factorial_Cache UnorderedRoll )
+OBJS_test_fact			:= $(patsubst %,$(OBJDIR)/%.o, \
+	factorial factorial_Cache )
+OBJS_test_unordered		:= $(patsubst %,$(OBJDIR)/%.o, \
+	factorial factorial_Cache UnorderedRoll )
+OBJS_soooperheroes_rolls	:= $(patsubst %,$(OBJDIR)/%.o, \
+	factorial factorial_Cache UnorderedRoll )
 
 include $(wildcard deps/*.d)
 

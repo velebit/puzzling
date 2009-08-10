@@ -1,14 +1,16 @@
 #include "combinatorics.h"
 #include "UnorderedRoll.h"
 #include "Successes.h"
+#include "SimpleUnitSumStatistics.h"
 
-#include <iostream>
-#include <string>
 #include <stdlib.h>
 #include <math.h>
 
+#include <vector>
+
 using namespace combinatorics;
 using namespace dice;
+using std::vector;
 
 #include <getopt.h>
 
@@ -20,7 +22,7 @@ class CmdLineParser
 public:
 	CmdLineParser(int argc, char **argv)
 		: m_dice(3), m_difficulty(7), m_skill(0),
-		  m_skillROI(false), m_dieROI(false)
+		  m_skillROI(false), m_dieROI(false), m_histogram(false)
 	{
 		processCommandLine(argc, argv);
 	}
@@ -30,6 +32,7 @@ public:
 	unsigned int getSkill() const      { return m_skill; }
 	bool         showSkillROI() const  { return m_skillROI; }
 	bool         showDieROI() const    { return m_dieROI; }
+	bool         showHistogram() const { return m_histogram; }
 
 private:
 	static void printUsage();
@@ -39,7 +42,8 @@ private:
 	// Key values for options that don't have short options associated w/ them
 	enum {
 		OPT_ROI_SKILL           = 1000,
-		OPT_ROI_DIE
+		OPT_ROI_DIE,
+		OPT_HISTOGRAM,
 	} opt_values_t;
 
 	// The long option list
@@ -53,6 +57,7 @@ private:
 	unsigned int m_skill;
 	bool         m_skillROI;
 	bool         m_dieROI;
+	bool         m_histogram;
 };
 
 // The long option list
@@ -66,12 +71,14 @@ const struct option CmdLineParser::long_opts[] = {
 	{"return-on-investment",        no_argument,       0, 'r'},
 	{"roi",                         no_argument,       0, 'r'},
 
+	{"histogram",                   no_argument,       0, 'h'},
+
 	{"help",                        no_argument,       0, '?'},
 	{0, 0, 0, 0}
 };
 
 // The short option list
-const char* const CmdLineParser::short_opts = "r?";
+const char* const CmdLineParser::short_opts = "rh?";
 
 void CmdLineParser::printUsage()
 {
@@ -99,6 +106,10 @@ void CmdLineParser::processCommandLine(int argc, char **argv)
 			break;
 		case 'r':             // "return-on-investment", "roi", "r"
 			m_skillROI = m_dieROI = true;
+			break;
+
+		case 'h':             // "histogram", "h"
+			m_histogram = true;
 			break;
 
 		case '?':
@@ -137,43 +148,13 @@ void CmdLineParser::processCommandLine(int argc, char **argv)
 }
 
 // ===================================================================
-// === simple statistics (average and standard deviation) ============
-
-class Statistics
-{
-public:
-	Statistics() : m_scale(0), m_sum(0), m_sumSq(0)
-	{
-	}
-
-	void addData(real_t weight, real_t value)
-	{
-		m_scale += weight;
-		m_sum   += weight * value;
-		m_sumSq += weight * value * value;
-	}
-
-	real_t getAverage() const
-	{
-		return m_sum / m_scale;
-	}
-
-	real_t getStandardDeviation() const
-	{
-		return sqrt(m_sumSq/m_scale - square(m_sum/m_scale));
-	}
-
-private:
-	static real_t square(real_t value) { return value*value; }
-
-private:
-	real_t m_scale;
-	real_t m_sum;
-	real_t m_sumSq;
-};
-
-// ===================================================================
 // === Putting it all together =======================================
+
+
+static inline unsigned int uiround(real_t value)
+{
+	return static_cast<unsigned int>(round(value));
+}
 
 // --- calculate and print "rated" results for a given roll ---
 
@@ -185,10 +166,11 @@ static void calculate_stats(const CmdLineParser& options)
 
 	printf("(%d dice, for %ds, skill %d)\n", dice, difficulty, skill);
 
-	Statistics statSuccesses;
-	Statistics statUnused;
-	Statistics statWanted;
-	Statistics statSkillROI;
+	SimpleUnitSumStatistics statSuccesses;
+	SimpleUnitSumStatistics statUnused;
+	SimpleUnitSumStatistics statWanted;
+	SimpleUnitSumStatistics statSkillROI;
+	vector<real_t>          successHistogram(dice+1);
 
 	UnorderedRoll r = UnorderedRoll::begin(dice);
 	bool keepGoing = true;
@@ -199,9 +181,10 @@ static void calculate_stats(const CmdLineParser& options)
 		statUnused.addData(r.getWeight(),    result.getUnusedSkill());
 		statWanted.addData(r.getWeight(),    result.getWantedSkill());
 		statSkillROI.addData(r.getWeight(),  result.getWantedSkill() == 1);
+		successHistogram[result.getSuccesses()] += r.getWeight();
 		keepGoing = r.increment();
 	}
-
+	
 	printf("Average number of successes: %10.6Lf (+/- %6.3Lf)\n",
 		   statSuccesses.getAverage(), statSuccesses.getStandardDeviation());
 	printf("Average unused skill:        %10.6Lf (+/- %6.3Lf)\n",
@@ -211,7 +194,7 @@ static void calculate_stats(const CmdLineParser& options)
 
 	if (options.showDieROI())
 	{
-		Statistics statSuccessesNext;
+		SimpleUnitSumStatistics statSuccessesNext;
 		UnorderedRoll r = UnorderedRoll::begin(dice+1);
 		bool keepGoing = true;
 		while (keepGoing)
@@ -228,6 +211,31 @@ static void calculate_stats(const CmdLineParser& options)
 	{
 		printf("Average next skill pt ROI:   %10.6Lf (+/- %6.3Lf)\n",
 			   statSkillROI.getAverage(), statSkillROI.getStandardDeviation());
+	}
+
+	if (options.showHistogram())
+	{
+		printf("\n");
+		printf("%-7s %-8s %-7s\n", "# Succ.", "At least", "Exactly");
+		printf("%-7s %-8s %-7s\n", "-------", "--------", "-------");
+		real_t atLeastThisMany = 1;
+		for (size_t i = 0;  i < successHistogram.size();  ++i)
+		{
+			char atLeastBuf[64];
+			sprintf(atLeastBuf, "(%.0Lf%%)", 100*atLeastThisMany);
+			printf("%4d %10s %5.0Lf%%   |",
+				   i, atLeastBuf, 100*successHistogram[i]);
+
+			const unsigned int WIDTH = 50;
+			unsigned int markStars = uiround(WIDTH * successHistogram[i]);
+			for (unsigned int j = 0;  j < markStars;  ++j)
+				printf("*");
+			for (unsigned int j = markStars;  j < WIDTH;  ++j)
+				printf(" ");
+
+			printf("|\n");
+			atLeastThisMany -= successHistogram[i];
+		}
 	}
 }
 

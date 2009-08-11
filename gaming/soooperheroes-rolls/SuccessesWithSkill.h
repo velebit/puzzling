@@ -8,13 +8,13 @@ namespace dice
 
 	// Calculate the number of successes, and other related parameters.
 
-	class Successes
+	class SuccessesWithSkill
 	{
 	public:
 		// --- construction ---
 
-		Successes(const UnorderedRoll& roll,
-				  unsigned int rollingFor = 7, unsigned int skill = 0)
+		SuccessesWithSkill(const UnorderedRoll& roll,
+						   unsigned int rollingFor = 7, unsigned int skill = 0)
 		{
 			if (rollingFor < 2)
 				rollingFor = 2;
@@ -62,10 +62,10 @@ namespace dice
 		// --- copy construction and assignment ---
 
 		// Prevent copy construction
-	    Successes(const Successes& successes);
+	    SuccessesWithSkill(const SuccessesWithSkill& successes);
 
 		// Prevent assignment
-	    Successes& operator=(const Successes& successes);
+	    SuccessesWithSkill& operator=(const SuccessesWithSkill& successes);
 
 	public:
 		// --- results access ---

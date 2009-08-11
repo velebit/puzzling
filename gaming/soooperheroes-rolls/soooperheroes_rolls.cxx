@@ -1,6 +1,6 @@
 #include "combinatorics.h"
 #include "UnorderedRoll.h"
-#include "Successes.h"
+#include "SuccessesWithSkill.h"
 #include "SimpleUnitSumStatistics.h"
 
 #include <stdlib.h>
@@ -176,7 +176,7 @@ static void calculate_stats(const CmdLineParser& options)
 	bool keepGoing = true;
 	while (keepGoing)
 	{
-		Successes result(r, difficulty, skill);
+		SuccessesWithSkill result(r, difficulty, skill);
 		statSuccesses.addData(r.getWeight(), result.getSuccesses());
 		statUnused.addData(r.getWeight(),    result.getUnusedSkill());
 		statWanted.addData(r.getWeight(),    result.getWantedSkill());
@@ -199,7 +199,7 @@ static void calculate_stats(const CmdLineParser& options)
 		bool keepGoing = true;
 		while (keepGoing)
 		{
-			Successes result(r, difficulty, skill);
+			SuccessesWithSkill result(r, difficulty, skill);
 			statSuccessesNext.addData(r.getWeight(), result.getSuccesses());
 			keepGoing = r.increment();
 		}

@@ -1,5 +1,5 @@
-#ifndef SUCCESSES__H
-#define SUCCESSES__H
+#ifndef SUCCESSES_WITH_SKILL__H
+#define SUCCESSES_WITH_SKILL__H
 
 #include "UnorderedRoll.h"
 
@@ -98,4 +98,4 @@ namespace dice
 	};
 }
 
-#endif // SUCCESSES__H
+#endif // SUCCESSES_WITH_SKILL__H

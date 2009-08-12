@@ -22,17 +22,22 @@ class CmdLineParser
 public:
 	CmdLineParser(int argc, char **argv)
 		: m_dice(3), m_difficulty(7), m_skill(0),
-		  m_skillROI(false), m_dieROI(false), m_histogram(false)
+		  m_skillROI(false), m_dieROI(false), m_histogram(false),
+		  m_plotChancesForSkills(false), m_plotExpectedForSkills(false),
+		  m_plotExpected(false)
 	{
 		processCommandLine(argc, argv);
 	}
 
-	unsigned int getDice() const       { return m_dice; }
-	unsigned int getDifficulty() const { return m_difficulty; }
-	unsigned int getSkill() const      { return m_skill; }
-	bool         showSkillROI() const  { return m_skillROI; }
-	bool         showDieROI() const    { return m_dieROI; }
-	bool         showHistogram() const { return m_histogram; }
+	unsigned int getDice() const         { return m_dice; }
+	unsigned int getDifficulty() const   { return m_difficulty; }
+	unsigned int getSkill() const        { return m_skill; }
+	bool doShowSkillROI() const          { return m_skillROI; }
+	bool doShowDieROI() const            { return m_dieROI; }
+	bool doShowHistogram() const         { return m_histogram; }
+	bool doPlotChancesForSkills() const  { return m_plotChancesForSkills; }
+	bool doPlotExpectedForSkills() const { return m_plotExpectedForSkills; }
+	bool doPlotExpected() const          { return m_plotExpected; }
 
 private:
 	static void printUsage();
@@ -43,7 +48,10 @@ private:
 	enum {
 		OPT_ROI_SKILL           = 1000,
 		OPT_ROI_DIE,
-		OPT_HISTOGRAM,
+		OPT_PLOT_PROB_SKILLS    = 1100,
+		OPT_PLOT_EXP_SKILLS,
+		OPT_PLOT_EXP_2ARG,
+		OPT_dummy
 	} opt_values_t;
 
 	// The long option list
@@ -58,6 +66,9 @@ private:
 	bool         m_skillROI;
 	bool         m_dieROI;
 	bool         m_histogram;
+	bool         m_plotChancesForSkills;
+	bool         m_plotExpectedForSkills;
+	bool         m_plotExpected;
 };
 
 // The long option list
@@ -72,6 +83,15 @@ const struct option CmdLineParser::long_opts[] = {
 	{"roi",                         no_argument,       0, 'r'},
 
 	{"histogram",                   no_argument,       0, 'h'},
+
+	{"plot-skill-probabilities",    no_argument,       0, OPT_PLOT_PROB_SKILLS},
+	{"psp",                         no_argument,       0, OPT_PLOT_PROB_SKILLS},
+
+	{"plot-skill-expected",         no_argument,       0, OPT_PLOT_EXP_SKILLS},
+	{"pse",                         no_argument,       0, OPT_PLOT_EXP_SKILLS},
+
+	{"plot-expected",               no_argument,       0, OPT_PLOT_EXP_2ARG},
+	{"pe",                          no_argument,       0, OPT_PLOT_EXP_2ARG},
 
 	{"help",                        no_argument,       0, '?'},
 	{0, 0, 0, 0}
@@ -101,15 +121,25 @@ void CmdLineParser::processCommandLine(int argc, char **argv)
 		case OPT_ROI_SKILL:   // "skill-return-on-investment", "skill-roi", "sr"
 			m_skillROI = true;
 			break;
-		case OPT_ROI_DIE:     // "die-return-on-investment", "die-roi", "dr"
+		case OPT_ROI_DIE:         // "die-return-on-investment", "die-roi", "dr"
 			m_dieROI = true;
 			break;
-		case 'r':             // "return-on-investment", "roi", "r"
+		case 'r':                   // "return-on-investment", "roi", "r"
 			m_skillROI = m_dieROI = true;
 			break;
 
-		case 'h':             // "histogram", "h"
+		case 'h':                   // "histogram", "h"
 			m_histogram = true;
+			break;
+
+		case OPT_PLOT_PROB_SKILLS:  // "plot-skill-probabilities", "psp"
+			m_plotChancesForSkills = true;
+			break;
+		case OPT_PLOT_EXP_SKILLS:   // "plot-skill-expected", "pse"
+			m_plotExpectedForSkills = true;
+			break;
+		case OPT_PLOT_EXP_2ARG:     // "plot-expected", "pe"
+			m_plotExpected = true;
 			break;
 
 		case '?':
@@ -150,6 +180,7 @@ void CmdLineParser::processCommandLine(int argc, char **argv)
 // ===================================================================
 // === Putting it all together =======================================
 
+// --- simple helpers ---
 
 static inline unsigned int uiround(real_t value)
 {
@@ -192,7 +223,7 @@ static void calculate_stats(const CmdLineParser& options)
 	printf("Average wanted skill:        %10.6Lf (+/- %6.3Lf)\n",
 		   statWanted.getAverage(), statWanted.getStandardDeviation());
 
-	if (options.showDieROI())
+	if (options.doShowDieROI())
 	{
 		SimpleUnitSumStatistics statSuccessesNext;
 		UnorderedRoll r = UnorderedRoll::begin(dice+1);
@@ -207,13 +238,13 @@ static void calculate_stats(const CmdLineParser& options)
 		printf("Average next die ROI:        %10.6Lf\n",
 			   statSuccessesNext.getAverage() - statSuccesses.getAverage());
 	}
-	if (options.showSkillROI())
+	if (options.doShowSkillROI())
 	{
 		printf("Average next skill pt ROI:   %10.6Lf (+/- %6.3Lf)\n",
 			   statSkillROI.getAverage(), statSkillROI.getStandardDeviation());
 	}
 
-	if (options.showHistogram())
+	if (options.doShowHistogram())
 	{
 		printf("\n");
 		printf("%-7s %-8s %-7s\n", "# Succ.", "At least", "Exactly");
@@ -237,6 +268,205 @@ static void calculate_stats(const CmdLineParser& options)
 			atLeastThisMany -= successHistogram[i];
 		}
 	}
+
+	if (options.doPlotChancesForSkills())
+	{
+		char fname[128];
+		sprintf(fname, "srplot_hist_%d_%d_%d.csv", dice, difficulty, skill);
+
+		FILE* out = fopen(fname, "w");
+		if (! out)
+		{
+			perror("fopen");
+			return;
+		}
+
+		const char* sep = "";
+		for (size_t i = 0;  i < successHistogram.size();  ++i)
+		{
+			fprintf(out, "%s%.3Lf", sep, 100*successHistogram[i]);
+			sep = ",";
+		}
+		fprintf(out, "\n");
+	}
+}
+
+// --- plot probabilities of number of successes, as a function of skill ---
+
+static void plot_chances_for_skills(const CmdLineParser& options)
+{
+	unsigned int dice       = options.getDice();
+	unsigned int difficulty = options.getDifficulty();
+	unsigned int maxSkill   = options.getSkill();
+
+	assert(options.doPlotChancesForSkills());
+	printf("(%d dice, for %ds, skill 0-%d)\n", dice, difficulty, maxSkill);
+
+	char fileName[128];
+	sprintf(fileName, "srplot_prob_%d_%d_0-%d.csv", dice, difficulty, maxSkill);
+	FILE* out = fopen(fileName, "w");
+	if (! out)
+	{
+		perror("fopen");
+		return;
+	}
+
+	vector< vector<real_t> > successTable(maxSkill+1);
+
+	for (unsigned int skill = 0;  skill <= maxSkill;  ++skill)
+	{
+		// TODO: This is woefully inefficient.  Leaving alone for now.
+
+		vector<real_t>& successHistogram = successTable[skill];
+		successHistogram.resize(dice+1);
+
+		UnorderedRoll r = UnorderedRoll::begin(dice);
+		bool keepGoing = true;
+		while (keepGoing)
+		{
+			SuccessesWithSkill result(r, difficulty, skill);
+			successHistogram[result.getSuccesses()] += r.getWeight();
+			keepGoing = r.increment();
+		}
+	}
+
+	for (unsigned int skill = 0;  skill <= maxSkill;  ++skill)
+	{
+		const char* sep = "";
+		for (size_t i = 0;  i < successTable[skill].size();  ++i)
+		{
+			fprintf(out, "%s%.3Lf", sep, 100*successTable[skill][i]);
+			sep = ",";
+		}
+		fprintf(out, "\n");
+	}
+
+	fclose(out);
+
+	char plotCmd[1024];
+	sprintf(plotCmd, "./plot-lines.py '%s'"
+			" '(%d dice, for %ds, skill 0-%d)' 'successes' '%% chance' &",
+			fileName, dice, difficulty, maxSkill);
+	system(plotCmd);
+}
+
+// --- plot probabilities of number of successes, as a function of skill ---
+
+static void plot_expected_for_skills(const CmdLineParser& options)
+{
+	unsigned int dice       = options.getDice();
+	unsigned int difficulty = options.getDifficulty();
+	unsigned int maxSkill   = options.getSkill();
+
+	assert(options.doPlotExpectedForSkills());
+	printf("(%d dice, for %ds, skill 0-%d)\n", dice, difficulty, maxSkill);
+
+	char fileName[128];
+	sprintf(fileName, "srplot_exp_%d_%d_0-%d.csv", dice, difficulty, maxSkill);
+	FILE* out = fopen(fileName, "w");
+	if (! out)
+	{
+		perror("fopen");
+		return;
+	}
+
+	vector<real_t> expectedSuccesses(maxSkill+1);
+
+	for (unsigned int skill = 0;  skill <= maxSkill;  ++skill)
+	{
+		// TODO: This is woefully inefficient.  Leaving alone for now.
+
+		SimpleUnitSumStatistics statSuccesses;
+
+		UnorderedRoll r = UnorderedRoll::begin(dice);
+		bool keepGoing = true;
+		while (keepGoing)
+		{
+			SuccessesWithSkill result(r, difficulty, skill);
+			statSuccesses.addData(r.getWeight(), result.getSuccesses());
+			keepGoing = r.increment();
+		}
+
+		expectedSuccesses[skill] = statSuccesses.getAverage();
+	}
+
+	const char* sep = "";
+	for (unsigned int skill = 0;  skill <= maxSkill;  ++skill)
+	{
+		fprintf(out, "%s%.3Lf", sep, expectedSuccesses[skill]);
+		sep = ",";
+	}
+	fprintf(out, "\n");
+
+	fclose(out);
+
+	char plotCmd[1024];
+	sprintf(plotCmd, "./plot-lines.py '%s'"
+			" '(%d dice, for %ds, skill 0-%d)' 'skill' 'expected successes' &",
+			fileName, dice, difficulty, maxSkill);
+	system(plotCmd);
+}
+
+// --- plot probabilities of number of successes, as a function of skill ---
+
+static void plot_expected_for_dice_and_skill(const CmdLineParser& options)
+{
+	unsigned int maxDice       = options.getDice();
+	unsigned int difficulty = options.getDifficulty();
+	unsigned int maxSkill   = options.getSkill();
+
+	assert(options.doPlotExpected());
+	printf("(0-%d dice, for %ds, skill 0-%d)\n",
+		   maxDice, difficulty, maxSkill);
+
+	char fileName[128];
+	sprintf(fileName, "srplot_exp_0-%d_%d_0-%d.csv",
+			maxDice, difficulty, maxSkill);
+	FILE* out = fopen(fileName, "w");
+	if (! out)
+	{
+		perror("fopen");
+		return;
+	}
+
+	for (unsigned int dice = 0;  dice <= maxDice;  ++dice)
+	{
+		vector<real_t> expectedSuccesses(maxSkill+1);
+
+		for (unsigned int skill = 0;  skill <= maxSkill;  ++skill)
+		{
+			// TODO: This is woefully inefficient.  Leaving alone for now.
+
+			SimpleUnitSumStatistics statSuccesses;
+
+			UnorderedRoll r = UnorderedRoll::begin(dice);
+			bool keepGoing = true;
+			while (keepGoing)
+			{
+				SuccessesWithSkill result(r, difficulty, skill);
+				statSuccesses.addData(r.getWeight(), result.getSuccesses());
+				keepGoing = r.increment();
+			}
+
+			expectedSuccesses[skill] = statSuccesses.getAverage();
+		}
+
+		const char* sep = "";
+		for (unsigned int skill = 0;  skill <= maxSkill;  ++skill)
+		{
+			fprintf(out, "%s%.3Lf", sep, expectedSuccesses[skill]);
+			sep = ",";
+		}
+		fprintf(out, "\n");
+	}
+
+	fclose(out);
+
+	char plotCmd[1024];
+	sprintf(plotCmd, "./plot-contours-sd.py '%s'"
+			" '(0-%d dice, for %ds, skill 0-%d)' &",
+			fileName, maxDice, difficulty, maxSkill);
+	system(plotCmd);
 }
 
 // --- main ---
@@ -245,6 +475,21 @@ int main(int argc, char** argv)
 {
 	CmdLineParser options(argc, argv);
 
-	calculate_stats(options);
+	if (options.doPlotChancesForSkills())
+	{
+		plot_chances_for_skills(options);
+	}
+	else if (options.doPlotExpectedForSkills())
+	{
+		plot_expected_for_skills(options);
+	}
+	else if (options.doPlotExpected())
+	{
+		plot_expected_for_dice_and_skill(options);
+	}
+	else
+	{
+		calculate_stats(options);
+	}
 	return 0;
 }

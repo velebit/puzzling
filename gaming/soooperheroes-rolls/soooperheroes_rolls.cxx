@@ -24,7 +24,7 @@ public:
 		: m_dice(3), m_difficulty(7), m_skill(0),
 		  m_skillROI(false), m_dieROI(false), m_histogram(false),
 		  m_plotChancesForSkills(false), m_plotExpectedForSkills(false),
-		  m_plotExpected(false)
+		  m_plotExpected(false), m_plotArgs("")
 	{
 		processCommandLine(argc, argv);
 	}
@@ -38,6 +38,7 @@ public:
 	bool doPlotChancesForSkills() const  { return m_plotChancesForSkills; }
 	bool doPlotExpectedForSkills() const { return m_plotExpectedForSkills; }
 	bool doPlotExpected() const          { return m_plotExpected; }
+	const char* getPlotArgs() const      { return m_plotArgs; }
 
 private:
 	static void printUsage();
@@ -51,6 +52,7 @@ private:
 		OPT_PLOT_PROB_SKILLS    = 1100,
 		OPT_PLOT_EXP_SKILLS,
 		OPT_PLOT_EXP_2ARG,
+		OPT_PLOT_ARGS,
 		OPT_dummy
 	} opt_values_t;
 
@@ -69,6 +71,7 @@ private:
 	bool         m_plotChancesForSkills;
 	bool         m_plotExpectedForSkills;
 	bool         m_plotExpected;
+	const char*  m_plotArgs;
 };
 
 // The long option list
@@ -92,6 +95,9 @@ const struct option CmdLineParser::long_opts[] = {
 
 	{"plot-expected",               no_argument,       0, OPT_PLOT_EXP_2ARG},
 	{"pe",                          no_argument,       0, OPT_PLOT_EXP_2ARG},
+
+	{"plot-arguments",              required_argument, 0, OPT_PLOT_ARGS},
+	{"pa",                          required_argument, 0, OPT_PLOT_ARGS},
 
 	{"help",                        no_argument,       0, '?'},
 	{0, 0, 0, 0}
@@ -142,6 +148,10 @@ void CmdLineParser::processCommandLine(int argc, char **argv)
 			m_plotExpected = true;
 			break;
 
+		case OPT_PLOT_ARGS:         // "plot-arguments", "pa"
+			m_plotArgs = optarg;
+			break;
+
 		case '?':
 			// if an error, a message was already printed by getopt_long
 			printUsage();
@@ -185,6 +195,12 @@ void CmdLineParser::processCommandLine(int argc, char **argv)
 static inline unsigned int uiround(real_t value)
 {
 	return static_cast<unsigned int>(round(value));
+}
+
+static inline void do_system(const char* cmd)
+{
+	printf("> %s\n", cmd);
+	system(cmd);
 }
 
 // --- calculate and print "rated" results for a given roll ---
@@ -268,27 +284,6 @@ static void calculate_stats(const CmdLineParser& options)
 			atLeastThisMany -= successHistogram[i];
 		}
 	}
-
-	if (options.doPlotChancesForSkills())
-	{
-		char fname[128];
-		sprintf(fname, "srplot_hist_%d_%d_%d.csv", dice, difficulty, skill);
-
-		FILE* out = fopen(fname, "w");
-		if (! out)
-		{
-			perror("fopen");
-			return;
-		}
-
-		const char* sep = "";
-		for (size_t i = 0;  i < successHistogram.size();  ++i)
-		{
-			fprintf(out, "%s%.3Lf", sep, 100*successHistogram[i]);
-			sep = ",";
-		}
-		fprintf(out, "\n");
-	}
 }
 
 // --- plot probabilities of number of successes, as a function of skill ---
@@ -303,13 +298,18 @@ static void plot_chances_for_skills(const CmdLineParser& options)
 	printf("(%d dice, for %ds, skill 0-%d)\n", dice, difficulty, maxSkill);
 
 	char fileName[128];
-	sprintf(fileName, "srplot_prob_%d_%d_0-%d.csv", dice, difficulty, maxSkill);
+	sprintf(fileName, "srplot_prob_f%d_d%d_s0-%d.csv",
+			difficulty, dice, maxSkill);
 	FILE* out = fopen(fileName, "w");
 	if (! out)
 	{
 		perror("fopen");
 		return;
 	}
+	fprintf(out, "!plot_title='(%d dice, for %ds, skill 0-%d)'\n",
+			dice, difficulty, maxSkill);
+	fprintf(out, "!x_label='successes'\n");
+	fprintf(out, "!y_label='%% chance'\n");
 
 	vector< vector<real_t> > successTable(maxSkill+1);
 
@@ -332,22 +332,19 @@ static void plot_chances_for_skills(const CmdLineParser& options)
 
 	for (unsigned int skill = 0;  skill <= maxSkill;  ++skill)
 	{
-		const char* sep = "";
 		for (size_t i = 0;  i < successTable[skill].size();  ++i)
 		{
-			fprintf(out, "%s%.3Lf", sep, 100*successTable[skill][i]);
-			sep = ",";
+			fprintf(out, "%.3Lf,", 100*successTable[skill][i]);
 		}
-		fprintf(out, "\n");
+		fprintf(out, "0\n");
 	}
 
 	fclose(out);
 
 	char plotCmd[1024];
-	sprintf(plotCmd, "./plot-lines.py '%s'"
-			" '(%d dice, for %ds, skill 0-%d)' 'successes' '%% chance' &",
-			fileName, dice, difficulty, maxSkill);
-	system(plotCmd);
+	sprintf(plotCmd, "./plot-lines.py '%s' %s &",
+			fileName, options.getPlotArgs());
+	do_system(plotCmd);
 }
 
 // --- plot probabilities of number of successes, as a function of skill ---
@@ -362,13 +359,18 @@ static void plot_expected_for_skills(const CmdLineParser& options)
 	printf("(%d dice, for %ds, skill 0-%d)\n", dice, difficulty, maxSkill);
 
 	char fileName[128];
-	sprintf(fileName, "srplot_exp_%d_%d_0-%d.csv", dice, difficulty, maxSkill);
+	sprintf(fileName, "srplot_exps_f%d_d%d_s0-%d.csv",
+			difficulty, dice, maxSkill);
 	FILE* out = fopen(fileName, "w");
 	if (! out)
 	{
 		perror("fopen");
 		return;
 	}
+	fprintf(out, "!plot_title='(%d dice, for %ds, skill 0-%d)'\n",
+			dice, difficulty, maxSkill);
+	fprintf(out, "!x_label='skill'\n");
+	fprintf(out, "!y_label='average expected successes'\n");
 
 	vector<real_t> expectedSuccesses(maxSkill+1);
 
@@ -401,10 +403,9 @@ static void plot_expected_for_skills(const CmdLineParser& options)
 	fclose(out);
 
 	char plotCmd[1024];
-	sprintf(plotCmd, "./plot-lines.py '%s'"
-			" '(%d dice, for %ds, skill 0-%d)' 'skill' 'expected successes' &",
-			fileName, dice, difficulty, maxSkill);
-	system(plotCmd);
+	sprintf(plotCmd, "./plot-lines.py '%s' %s &",
+			fileName, options.getPlotArgs());
+	do_system(plotCmd);
 }
 
 // --- plot probabilities of number of successes, as a function of skill ---
@@ -416,20 +417,22 @@ static void plot_expected_for_dice_and_skill(const CmdLineParser& options)
 	unsigned int maxSkill   = options.getSkill();
 
 	assert(options.doPlotExpected());
-	printf("(0-%d dice, for %ds, skill 0-%d)\n",
+	printf("(1-%d dice, for %ds, skill 0-%d)\n",
 		   maxDice, difficulty, maxSkill);
 
 	char fileName[128];
-	sprintf(fileName, "srplot_exp_0-%d_%d_0-%d.csv",
-			maxDice, difficulty, maxSkill);
+	sprintf(fileName, "srplot_expc_f%d_d1-%d_s0-%d.csv",
+			difficulty, maxDice, maxSkill);
 	FILE* out = fopen(fileName, "w");
 	if (! out)
 	{
 		perror("fopen");
 		return;
 	}
+	fprintf(out, "!plot_title='(1-%d dice, for %ds, skill 0-%d)'\n",
+			maxDice, difficulty, maxSkill);
 
-	for (unsigned int dice = 0;  dice <= maxDice;  ++dice)
+	for (unsigned int dice = 1;  dice <= maxDice;  ++dice)
 	{
 		vector<real_t> expectedSuccesses(maxSkill+1);
 
@@ -463,10 +466,9 @@ static void plot_expected_for_dice_and_skill(const CmdLineParser& options)
 	fclose(out);
 
 	char plotCmd[1024];
-	sprintf(plotCmd, "./plot-contours-sd.py '%s'"
-			" '(0-%d dice, for %ds, skill 0-%d)' &",
-			fileName, maxDice, difficulty, maxSkill);
-	system(plotCmd);
+	sprintf(plotCmd, "./plot-contours-sd.py '%s' %s &",
+			fileName, options.getPlotArgs());
+	do_system(plotCmd);
 }
 
 // --- main ---

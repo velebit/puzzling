@@ -3,18 +3,36 @@ import numpy
 from numpy import *
 from pylab import *
 from sys import argv
+import re
+import string
 
-# parse the command line:
-plot_title = save_file = ''
-
+# parse the first command line argument (filename):
 csv_file = argv[1]
-if size(argv) > 2:
-    plot_title = argv[2]
-if size(argv) > 3:
-    save_file = argv[3]
+
+# optional parameter variables
+plot_title = x_label = y_label = x_max = y_max = save_file = None
+show_legend = no_gui = None
+
+# defaults
+x_label="skill levels"
+y_label="dice (CP cost)"
+skill_cost=5
 
 # load the data:
-data = loadtxt(csv_file, delimiter=',')
+data = loadtxt(csv_file, delimiter=',', comments='!')
+# ...and add a first row ("0 dice") composed entirely of zeroes:
+data = insert(data, 0, 0, axis=0)
+
+# load the variables:
+vars = string.join([line[1:]
+                    for line in open(csv_file, 'r').readlines()
+                    if re.search(r'^![^!]', line)],
+                   "")
+exec vars
+
+# parse the rest of the command line, overriding variables from the file:
+for i in range(2, size(argv)):
+    exec argv[i]
 
 # set up the data axis values:
 dice      = arange(size(data,0))
@@ -29,26 +47,29 @@ ch = contour(skill, dice_cost, data, slices)
 clabel(ch, fmt="%.1f")
 # set the ticks/grid lines:
 xticks(skill)
-#yticks(dice_cost, dice)
-#xticks(skill, ["%d\n%d" % (s,5*s) for s in skill])
 dice_labels = ["%dd (%d)" % (d,d*(d+1)/2) for d in dice]
-dice_labels[0] = "0"
+dice_labels[0] = ''
 yticks(dice_cost, dice_labels)
 grid(True, alpha=0.2)
 # set limits to match the last grid line:
-xlim(xmax=xticks()[0][-1])
-ylim(ymax=yticks()[0][-1])
-# set aspect assuming 5 pts/level:
-gca().set_aspect(1./5)
+xlim(xmin=0, xmax=xticks()[0][-1])
+ylim(ymin=0, ymax=yticks()[0][-1])
+# set aspect assuming 5 (or whatever) pts/level:
+gca().set_aspect(1./skill_cost)
 
-if len(plot_title) > 0:
+if not plot_title is None:
     title(plot_title)
-xlabel("skill levels")
-ylabel("dice (CP cost)")
+if not x_label is None:
+    xlabel(x_label)
+if not y_label is None:
+    ylabel(y_label)
+if not x_max is None:
+    xlim(xmin=0, xmax=x_max)
+if not y_max is None:
+    ylim(ymin=0, ymax=y_max)
 
-if len(save_file) > 0:
-    # if a save file was specified, ONLY save.
-    savefig(save_file)
-else:
-    savefig(csv_file.replace('.csv', '') + '.png')
+if save_file is None:
+    save_file = csv_file.replace('.csv', '') + '.png'
+savefig(save_file)
+if no_gui is None:
     show()

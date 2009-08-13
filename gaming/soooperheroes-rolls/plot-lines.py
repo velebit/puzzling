@@ -11,7 +11,7 @@ csv_file = argv[1]
 
 # optional parameter variables
 plot_title = x_label = y_label = x_max = y_max = save_file = None
-show_legend = no_gui = None
+show_legend = no_save = no_gui = None
 
 # defaults
 markers = [ 'o', 'v', '^', '<', '>',
@@ -62,6 +62,7 @@ if not y_max is None:
 
 if save_file is None:
     save_file = csv_file.replace('.csv', '') + '.png'
-savefig(save_file)
+if no_save is None:
+    savefig(save_file)
 if no_gui is None:
     show()

@@ -11,7 +11,7 @@ csv_file = argv[1]
 
 # optional parameter variables
 plot_title = x_label = y_label = x_max = y_max = save_file = None
-show_legend = no_gui = None
+show_guides = no_save = no_gui = None
 
 # defaults
 x_label="skill levels"
@@ -45,6 +45,24 @@ slices    = arange(z_step, max_data * 1.001, z_step)
 # plot data and contour labels:
 ch = contour(skill, dice_cost, data, slices)
 clabel(ch, fmt="%.1f")
+# draw "diagonals" (lines where dice and skill costs match) for various pts/lv
+if not show_guides is None:
+    max_skill, max_dice = float(skill[-1]), float(dice_cost[-1])
+    data_aspect = max_dice/max_skill
+    for i in range(1,show_guides+1):
+        if i <= 5:
+            c, a = "#aa0077", 0.2
+        else:
+            c, a = "#0000ff", 0.1
+        if i < data_aspect:
+            mx=max_skill
+        else:
+            mx=max_dice/i
+        plot([0,.94*mx],[0,.94*mx*i], color=c, alpha=a)
+        text(.97*mx, .97*mx*i, "%d" % i,
+              rotation=180/pi*arctan2(i,skill_cost), color=c, alpha=a,
+              horizontalalignment='center', verticalalignment='center')
+
 # set the ticks/grid lines:
 xticks(skill)
 dice_labels = ["%dd (%d)" % (d,d*(d+1)/2) for d in dice]
@@ -70,6 +88,7 @@ if not y_max is None:
 
 if save_file is None:
     save_file = csv_file.replace('.csv', '') + '.png'
-savefig(save_file)
+if no_save is None:
+    savefig(save_file)
 if no_gui is None:
     show()

@@ -11,7 +11,8 @@ csv_file = argv[1]
 
 # optional parameter variables
 plot_title = x_label = y_label = x_max = y_max = save_file = None
-show_guides = no_save = no_gui = None
+no_save = no_gui = x_lim = y_lim = None
+show_guides = None
 
 # defaults
 x_label="skill levels"
@@ -34,12 +35,18 @@ exec vars
 for i in range(2, size(argv)):
     exec argv[i]
 
+# slice up the data set as desired
+if not x_lim is None:
+    data = data[:,0:(x_lim+1)]
+if not y_lim is None:
+    data = data[0:(y_lim+1),:]  # note: rows start at 0 (we prepended it)
+
 # set up the data axis values:
 dice      = arange(size(data,0))
 skill     = arange(size(data,1))
 dice_cost = dice*(dice+1)/2
 max_data  = data.max()
-z_step    = ceil(max_data/10)
+z_step    = ceil(max_data/20)
 slices    = arange(z_step, max_data * 1.001, z_step)
 
 # plot data and contour labels:

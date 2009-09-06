@@ -421,8 +421,8 @@ static void plot_expected_for_dice_and_skill(const CmdLineParser& options)
 		   maxDice, difficulty, maxSkill);
 
 	char fileName[128];
-	sprintf(fileName, "srplot_expc_f%d_d1-%d_s0-%d.csv",
-			difficulty, maxDice, maxSkill);
+	sprintf(fileName, "srplot_expc_d1-%d_s0-%d_f%d.csv",
+			maxDice, maxSkill, difficulty);
 	FILE* out = fopen(fileName, "w");
 	if (! out)
 	{

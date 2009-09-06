@@ -11,12 +11,13 @@ csv_file = argv[1]
 
 # optional parameter variables
 plot_title = x_label = y_label = x_max = y_max = save_file = None
-show_legend = no_save = no_gui = None
+no_save = no_gui = x_lim = y_lim = None
+show_legend = None
 
 # defaults
 markers = [ 'o', 'v', '^', '<', '>',
             #'1', '2', '3', '4',   # hard to see!
-            's', 'p', '*',
+            's', 'p', #'*',
             #'h', 'H',             # hard to distinguish from 'o', 'p'
             #'+', 'x',             # hard to see!
             'D', 'd',
@@ -36,6 +37,12 @@ exec vars
 # parse the rest of the command line, overriding variables from the file:
 for i in range(2, size(argv)):
     exec argv[i]
+
+# slice up the data set as desired
+if not x_lim is None:
+    data = data[:,0:(x_lim+1)]
+if not y_lim is None:
+    data = data[0:(y_lim+0),:]  # note: rows start at 1
 
 # plot the data:
 if data.ndim < 2:

@@ -38,7 +38,8 @@ all:     $(OBJDIR).dir deps.dir $(BINARIES)
 clean:
 	rm -f *.csv $(OBJDIR)/* *.stackdump core.* $(BINARIES)
 veryclean: clean
-	rm -f *~ .*~ *.png deps/* objs/*/* $(BIN_NAMES:%=%.exe) $(BIN_NAMES)
+	rm -f *~ .*~ *.png *.pdf deps/* objs/*/* \
+		$(BIN_NAMES:%=%.exe) $(BIN_NAMES)
 	find deps objs -depth | xargs rm -rf
 %.dir:
 	@if [ ! -e $* ]; then echo mkdir -p $*; mkdir -p $*; fi

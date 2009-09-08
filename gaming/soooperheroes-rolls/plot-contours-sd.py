@@ -10,11 +10,12 @@ import string
 csv_file = argv[1]
 
 # optional parameter variables
-plot_title = x_label = y_label = x_max = y_max = save_file = None
+plot_title = x_label = y_label = x_max = y_max = save_file = save_ext = None
 no_save = no_gui = x_lim = y_lim = None
 show_guides = None
 
 # defaults
+save_ext="png"
 x_label="skill levels"
 y_label="dice (CP cost)"
 skill_cost=5
@@ -94,8 +95,8 @@ if not y_max is None:
     ylim(ymin=0, ymax=y_max)
 
 if save_file is None:
-    save_file = csv_file.replace('.csv', '') + '.png'
+    save_file = csv_file.replace('.csv', '')
 if no_save is None:
-    savefig(save_file)
+    savefig(save_file + '.' + save_ext)
 if no_gui is None:
     show()

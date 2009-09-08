@@ -24,7 +24,7 @@ public:
 		: m_dice(3), m_difficulty(7), m_skill(0),
 		  m_skillROI(false), m_dieROI(false), m_histogram(false),
 		  m_plotChancesForSkills(false), m_plotExpectedForSkills(false),
-		  m_plotExpected(false), m_plotArgs("")
+		  m_plotExpected(false), m_makePlot(true), m_plotArgs("")
 	{
 		processCommandLine(argc, argv);
 	}
@@ -38,6 +38,7 @@ public:
 	bool doPlotChancesForSkills() const  { return m_plotChancesForSkills; }
 	bool doPlotExpectedForSkills() const { return m_plotExpectedForSkills; }
 	bool doPlotExpected() const          { return m_plotExpected; }
+	bool doMakePlot() const              { return m_makePlot; }
 	const char* getPlotArgs() const      { return m_plotArgs; }
 
 private:
@@ -53,6 +54,7 @@ private:
 		OPT_PLOT_EXP_SKILLS,
 		OPT_PLOT_EXP_2ARG,
 		OPT_PLOT_ARGS,
+		OPT_NO_PLOT,
 		OPT_dummy
 	} opt_values_t;
 
@@ -71,6 +73,7 @@ private:
 	bool         m_plotChancesForSkills;
 	bool         m_plotExpectedForSkills;
 	bool         m_plotExpected;
+	bool         m_makePlot;
 	const char*  m_plotArgs;
 };
 
@@ -95,6 +98,10 @@ const struct option CmdLineParser::long_opts[] = {
 
 	{"plot-expected",               no_argument,       0, OPT_PLOT_EXP_2ARG},
 	{"pe",                          no_argument,       0, OPT_PLOT_EXP_2ARG},
+
+	{"dont-plot",                   no_argument,       0, OPT_NO_PLOT},
+	{"no-plot",                     no_argument,       0, OPT_NO_PLOT},
+	{"np",                          no_argument,       0, OPT_NO_PLOT},
 
 	{"plot-arguments",              required_argument, 0, OPT_PLOT_ARGS},
 	{"pa",                          required_argument, 0, OPT_PLOT_ARGS},
@@ -146,6 +153,10 @@ void CmdLineParser::processCommandLine(int argc, char **argv)
 			break;
 		case OPT_PLOT_EXP_2ARG:     // "plot-expected", "pe"
 			m_plotExpected = true;
+			break;
+
+		case OPT_NO_PLOT:           // "dont-plot", "no-plot", "np"
+			m_makePlot = false;
 			break;
 
 		case OPT_PLOT_ARGS:         // "plot-arguments", "pa"
@@ -341,10 +352,13 @@ static void plot_chances_for_skills(const CmdLineParser& options)
 
 	fclose(out);
 
-	char plotCmd[1024];
-	sprintf(plotCmd, "./plot-lines.py '%s' %s &",
-			fileName, options.getPlotArgs());
-	do_system(plotCmd);
+	if (options.doMakePlot())
+	{
+		char plotCmd[1024];
+		sprintf(plotCmd, "./plot-lines.py '%s' %s &",
+				fileName, options.getPlotArgs());
+		do_system(plotCmd);
+	}
 }
 
 // --- plot probabilities of number of successes, as a function of skill ---
@@ -402,10 +416,13 @@ static void plot_expected_for_skills(const CmdLineParser& options)
 
 	fclose(out);
 
-	char plotCmd[1024];
-	sprintf(plotCmd, "./plot-lines.py '%s' %s &",
-			fileName, options.getPlotArgs());
-	do_system(plotCmd);
+	if (options.doMakePlot())
+	{
+		char plotCmd[1024];
+		sprintf(plotCmd, "./plot-lines.py '%s' %s &",
+				fileName, options.getPlotArgs());
+		do_system(plotCmd);
+	}
 }
 
 // --- plot probabilities of number of successes, as a function of skill ---
@@ -465,10 +482,13 @@ static void plot_expected_for_dice_and_skill(const CmdLineParser& options)
 
 	fclose(out);
 
-	char plotCmd[1024];
-	sprintf(plotCmd, "./plot-contours-sd.py '%s' %s &",
-			fileName, options.getPlotArgs());
-	do_system(plotCmd);
+	if (options.doMakePlot())
+	{
+		char plotCmd[1024];
+		sprintf(plotCmd, "./plot-contours-sd.py '%s' %s &",
+				fileName, options.getPlotArgs());
+		do_system(plotCmd);
+	}
 }
 
 // --- main ---

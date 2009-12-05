@@ -115,8 +115,29 @@ const char* const CmdLineParser::short_opts = "rh?";
 
 void CmdLineParser::printUsage()
 {
-	fprintf(stderr, "Usage: soooperheroes_rolls [options...]"
-			" dice [difficulty [skill]]\n");
+	fprintf(stderr,
+			"Usage: soooperheroes_rolls [options...]"
+			" dice [difficulty [skill]]\n"
+			"Options:\n"
+			"skill-return-on-investment (-sr)"
+			"  Print extra successes for 1 extra skill lvl.\n"
+			"die-return-on-investment   (-dr)"
+			"  Print extra successes for 1 extra stat die.\n"
+			"histogram                   (-h)"
+			"  Display a histogram.\n"
+			"\n"
+			"Plotting options:\n"
+			"no-plot                    (-np)"
+			"  Generate output file, but no visual plot.\n"
+			"plot-skill-probabilities  (-psp)"
+			"  (make a plot)\n"
+			"plot-skill-expected       (-pse)"
+			"  (make a plot)\n"
+			"plot-expected              (-pe)"
+			"  (make a plot)\n"
+			"plot-arguments             (-pa)"
+			"  Extra args for the plot script.\n"
+		);
 	exit(1);
 }
 
@@ -203,6 +224,11 @@ void CmdLineParser::processCommandLine(int argc, char **argv)
 
 // --- simple helpers ---
 
+static inline int iround(real_t value)
+{
+	return static_cast<int>(round(value));
+}
+
 static inline unsigned int uiround(real_t value)
 {
 	return static_cast<unsigned int>(round(value));
@@ -212,6 +238,94 @@ static inline void do_system(const char* cmd)
 {
 	printf("> %s\n", cmd);
 	system(cmd);
+}
+
+template <typename T>
+static inline void swap(T& a, T& b)
+{
+	T temp = a;
+	a = b;
+	b = temp;
+}
+
+// --- histogram output helpers ---
+
+static inline void print_block(int numMarks, char ch)
+{
+	for (int i = 0;  i < numMarks;  ++i)
+		putchar(ch);
+}
+
+static inline void print_bar(int width, int numMarks, char ch = '*')
+{
+	if (numMarks > width)
+	{
+		print_block(width-1, ch);
+		print_block(1, '>');
+	}
+	else
+	{
+		print_block(numMarks, ch);
+		print_block(width - numMarks, ' ');
+	}
+}
+
+static inline void print_bar_minus_plus(int width, int numMarks,
+										char chM = '-', char chP = '+')
+{
+	if (numMarks < -width)
+	{
+		print_block(1,       '<');
+		print_block(width-1, chM);
+		print_block(width,   ' ');
+	}
+	else if (numMarks > width)
+	{
+		print_block(width,   ' ');
+		print_block(width-1, chP);
+		print_block(1,       '>');
+	}
+	else if (numMarks < 0)
+	{
+		print_block(width + numMarks, ' ');
+		print_block(-numMarks,        chM);
+		print_block(width,            ' ');
+	}
+	else
+	{
+		print_block(width,            ' ');
+		print_block(numMarks,         chP);
+		print_block(width - numMarks, ' ');
+	}
+}
+
+static inline void print_bar_delta(int width, int numMarks1, int numMarks2,
+								   char ch = '*',
+								   char chM = '-', char chP = '+')
+{
+	if (numMarks1 > numMarks2)
+	{
+		swap(numMarks1, numMarks2);
+		chP = chM;
+	}
+
+	if (numMarks1 > width)
+	{
+		print_block(width-1, ch);
+		print_block(1,       '>');
+	}
+	else if (numMarks2 > width)
+	{
+		print_block(numMarks1,             ch);
+		print_block(width - numMarks1 - 1, chP);
+		print_block(1,                     '>');
+	}
+	else
+	{
+		print_block(numMarks1,             ch);
+		print_block(numMarks2 - numMarks1, chP);
+		print_block(width - numMarks2,     ' ');
+	}
 }
 
 // --- calculate and print "rated" results for a given roll ---
@@ -229,6 +343,7 @@ static void calculate_stats(const CmdLineParser& options)
 	SimpleUnitSumStatistics statWanted;
 	SimpleUnitSumStatistics statSkillROI;
 	vector<real_t>          successHistogram(dice+1);
+	vector<real_t>          skillROIHistogram(dice+1);
 
 	UnorderedRoll r = UnorderedRoll::begin(dice);
 	bool keepGoing = true;
@@ -240,6 +355,11 @@ static void calculate_stats(const CmdLineParser& options)
 		statWanted.addData(r.getWeight(),    result.getWantedSkill());
 		statSkillROI.addData(r.getWeight(),  result.getWantedSkill() == 1);
 		successHistogram[result.getSuccesses()] += r.getWeight();
+		if (result.getWantedSkill() == 1)
+		{
+			skillROIHistogram[result.getSuccesses()]   -= r.getWeight();
+			skillROIHistogram[result.getSuccesses()+1] += r.getWeight();
+		}
 		keepGoing = r.increment();
 	}
 	
@@ -249,27 +369,6 @@ static void calculate_stats(const CmdLineParser& options)
 		   statUnused.getAverage(), statUnused.getStandardDeviation());
 	printf("Average wanted skill:        %10.6Lf (+/- %6.3Lf)\n",
 		   statWanted.getAverage(), statWanted.getStandardDeviation());
-
-	if (options.doShowDieROI())
-	{
-		SimpleUnitSumStatistics statSuccessesNext;
-		UnorderedRoll r = UnorderedRoll::begin(dice+1);
-		bool keepGoing = true;
-		while (keepGoing)
-		{
-			SuccessesWithSkill result(r, difficulty, skill);
-			statSuccessesNext.addData(r.getWeight(), result.getSuccesses());
-			keepGoing = r.increment();
-		}
-
-		printf("Average next die ROI:        %10.6Lf\n",
-			   statSuccessesNext.getAverage() - statSuccesses.getAverage());
-	}
-	if (options.doShowSkillROI())
-	{
-		printf("Average next skill pt ROI:   %10.6Lf (+/- %6.3Lf)\n",
-			   statSkillROI.getAverage(), statSkillROI.getStandardDeviation());
-	}
 
 	if (options.doShowHistogram())
 	{
@@ -283,16 +382,138 @@ static void calculate_stats(const CmdLineParser& options)
 			sprintf(atLeastBuf, "(%.0Lf%%)", 100*atLeastThisMany);
 			printf("%4d %10s %5.0Lf%%   |",
 				   i, atLeastBuf, 100*successHistogram[i]);
-
-			const unsigned int WIDTH = 50;
-			unsigned int markStars = uiround(WIDTH * successHistogram[i]);
-			for (unsigned int j = 0;  j < markStars;  ++j)
-				printf("*");
-			for (unsigned int j = markStars;  j < WIDTH;  ++j)
-				printf(" ");
-
+			const int WIDTH = 50;
+			print_bar(WIDTH, iround(WIDTH * successHistogram[i]));
 			printf("|\n");
 			atLeastThisMany -= successHistogram[i];
+		}
+		printf("\n");
+	}
+
+	if (options.doShowDieROI())
+	{
+		SimpleUnitSumStatistics statSuccessesNext;
+		vector<real_t>          successHistogramNext(dice+2);
+		UnorderedRoll r = UnorderedRoll::begin(dice+1);
+		bool keepGoing = true;
+		while (keepGoing)
+		{
+			SuccessesWithSkill result(r, difficulty, skill);
+			statSuccessesNext.addData(r.getWeight(), result.getSuccesses());
+			successHistogramNext[result.getSuccesses()] += r.getWeight();
+			keepGoing = r.increment();
+		}
+
+		printf("Average next die ROI:        %10.6Lf\n",
+			   statSuccessesNext.getAverage() - statSuccesses.getAverage());
+
+		if (options.doShowHistogram())
+		{
+			printf("\n");
+			printf("%-7s %-8s %-7s\n", "# Succ.", "At least", "Exactly");
+			printf("%-7s %-8s %-7s\n", "-------", "--------", "-------");
+			real_t atLeastThisMany = 0;
+			for (size_t i = 0;  i < successHistogramNext.size();  ++i)
+			{
+				real_t nextHist = successHistogramNext[i];
+				real_t currHist = 0;
+				if (i < successHistogram.size())
+					currHist = successHistogram[i];
+
+				char atLeastBuf[64];
+				sprintf(atLeastBuf, "(%+.0Lf%%)", 100*atLeastThisMany);
+				printf("%4d %10s %+5.0Lf%%   |",
+					   i, atLeastBuf, 100*(nextHist - currHist));
+
+				const int WIDTH = 25;
+				print_bar_minus_plus(WIDTH,
+									 iround(5 * WIDTH*(nextHist - currHist)));
+
+				printf("|\n");
+				atLeastThisMany -= (nextHist - currHist);
+			}
+			printf("\n");
+		}
+		if (options.doShowHistogram())
+		{
+			printf("\n");
+			printf("%-7s %-8s %-7s\n", "# Succ.", "At least", "Exactly");
+			printf("%-7s %-8s %-7s\n", "-------", "--------", "-------");
+			real_t atLeastThisMany = 1;
+			for (size_t i = 0;  i < successHistogramNext.size();  ++i)
+			{
+				real_t nextHist = successHistogramNext[i];
+				real_t currHist = 0;
+				if (i < successHistogramNext.size())
+					currHist = successHistogram[i];
+
+				char atLeastBuf[64];
+				sprintf(atLeastBuf, "(%.0Lf%%)", 100*atLeastThisMany);
+				printf("%4d %10s %5.0Lf%%   |",
+					   i, atLeastBuf, 100*nextHist);
+
+				const int WIDTH = 50;
+				print_bar_delta(WIDTH,
+								iround(WIDTH * currHist),
+								iround(WIDTH * nextHist));
+
+				printf("|\n");
+				atLeastThisMany -= nextHist;
+			}
+			printf("\n");
+		}
+	}
+
+	if (options.doShowSkillROI())
+	{
+		printf("Average next skill lvl ROI:  %10.6Lf (+/- %6.3Lf)\n",
+			   statSkillROI.getAverage(), statSkillROI.getStandardDeviation());
+
+		if (options.doShowHistogram())
+		{
+			printf("\n");
+			printf("%-7s %-8s %-7s\n", "# Succ.", "At least", "Exactly");
+			printf("%-7s %-8s %-7s\n", "-------", "--------", "-------");
+			real_t atLeastThisMany = 0;
+			for (size_t i = 0;  i < skillROIHistogram.size();  ++i)
+			{
+				char atLeastBuf[64];
+				sprintf(atLeastBuf, "(%+.0Lf%%)", 100*atLeastThisMany);
+				printf("%4d %10s %+5.0Lf%%   |",
+					   i, atLeastBuf, 100*skillROIHistogram[i]);
+
+				const int WIDTH = 25;
+				print_bar_minus_plus(WIDTH,
+									 iround(5 * WIDTH*skillROIHistogram[i]));
+
+				printf("|\n");
+				atLeastThisMany -= skillROIHistogram[i];
+			}
+			printf("\n");
+		}
+		if (options.doShowHistogram())
+		{
+			printf("\n");
+			printf("%-7s %-8s %-7s\n", "# Succ.", "At least", "Exactly");
+			printf("%-7s %-8s %-7s\n", "-------", "--------", "-------");
+			real_t atLeastThisMany = 1;
+			for (size_t i = 0;  i < skillROIHistogram.size();  ++i)
+			{
+				real_t nextHist = successHistogram[i] + skillROIHistogram[i];
+				char atLeastBuf[64];
+				sprintf(atLeastBuf, "(%.0Lf%%)", 100*atLeastThisMany);
+				printf("%4d %10s %5.0Lf%%   |",
+					   i, atLeastBuf, 100*nextHist);
+
+				const int WIDTH = 50;
+				print_bar_delta(WIDTH,
+								iround(WIDTH * successHistogram[i]),
+								iround(WIDTH * nextHist));
+
+				printf("|\n");
+				atLeastThisMany -= nextHist;
+			}
+			printf("\n");
 		}
 	}
 }

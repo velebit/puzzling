@@ -10,7 +10,7 @@ void test00_construct_empty()
 	{
 		for (int j = 0;  j < 8;  ++j)
 		{
-			checkTrue("all grid slots are empty", ! g.isSet(i, j));
+			checkTrue("all grid slots are empty", g.isEmpty(i, j));
 		}
 	}
 }
@@ -20,7 +20,7 @@ void test10_single_element_grid()
 	Grid g;
 	g.set(0,0, 1);
 
-	checkTrue("one grid slot is filled",   g.isSet(0, 0));
+	checkTrue("one grid slot is filled",   g.hasValue(0, 0));
 	checkTrue("one grid slot is set to 1", g.get(0, 0) == 1);
 
 	for (int i = 0;  i < 8;  ++i)
@@ -29,7 +29,7 @@ void test10_single_element_grid()
 		{
 			if (! (i == 0 && j == 0))
 			{
-				checkTrue("all but one grid slots are empty", ! g.isSet(i, j));
+				checkTrue("all but one grid slots are empty", g.isEmpty(i, j));
 				if (i == 0 || j == 0 || i == j)
 				{
 					checkTrue("these 3 lines can't get a 1",
@@ -69,16 +69,16 @@ static void do_test50_grid_lines(int r, int c, int v)
 		{
 			if ((i == r) && (j == c))
 			{
-				checkTrue("center is unset", ! g.isSet(i, j));
+				checkTrue("center is unset", g.isEmpty(i, j));
 			}
 			else if ( (i == r) || (j == c)
 					  || ((i-j) == (r-c)) || ((i+j) == (r+c)) )
 			{
-				checkTrue("lines are set", g.isSet(i, j));
+				checkTrue("lines are set", g.hasValue(i, j));
 			}
 			else
 			{
-				checkTrue("background is unset", ! g.isSet(i, j));
+				checkTrue("background is unset", g.isEmpty(i, j));
 			}
 		}
 	}

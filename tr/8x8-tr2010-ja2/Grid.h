@@ -64,45 +64,56 @@ public:
 		return m_elements[r*NUM_COLUMNS + c];
 	}
 
-	// This is for testing ONLY...
+	// Set without doing any sanity checks.
+	// Useful if the grid is being used for something other than
+	// trying to build a pseudo-magic square.
 	void setRaw(int r, int c, value_type value)
 	{
 		checkCell(r, c);
 		m_elements[r*NUM_COLUMNS + c] = value;
 	}
 
-	// Returns true if all is well, false if a full grid is not tenable
-	bool set(int r, int c, value_type value)
+	// Returns the number of blank cells that had to be added because
+	// no other option was possible.
+	int set(int r, int c, value_type value)
 	{
 		checkCell(r, c);
-		assert(! isSet(r, c));
+		assert(isEmpty(r, c));
 		assert(canBeSetTo(r, c, value));
 		m_elements[r*NUM_COLUMNS + c] = value;
-		bool status = addConflictingElements(r, c, value);
+		int extraBlanks = markConflictingElements(r, c, value);
 		//sanityCheck();
-		return status;
+		return extraBlanks;
 	}
 
-	bool isSet(int r, int c) const
+	bool hasValue(int r, int c) const
 	{
 		return get(r, c) <= CellValueSet::MAX_VALUE;
-	}
-
-	void makeBlank(int r, int c)
-	{
-		checkCell(r, c);
-		assert(! isSet(r, c));
-		m_elements[r*NUM_COLUMNS + c] = BLANK;
-	}
-
-	bool isBlank(int r, int c)
-	{
-		return get(r, c) == BLANK;
 	}
 
 	bool canBeSetTo(int r, int c, value_type value)
 	{
 		return ! m_conflicts[r*NUM_COLUMNS + c].contains(value);
+	}
+
+	// "Empty" means "hasn't been set yet, may be set in the future".
+	bool isEmpty(int r, int c) const
+	{
+		return get(r, c) == EMPTY;
+	}
+
+	// "Blank" means "set to a non-numeric blank square".
+	void setToBlank(int r, int c)
+	{
+		checkCell(r, c);
+		assert(isEmpty(r, c));
+		m_elements[r*NUM_COLUMNS + c] = BLANK;
+	}
+
+	// "Blank" means "set to a non-numeric blank square".
+	bool isBlank(int r, int c) const
+	{
+		return get(r, c) == BLANK;
 	}
 
 	void sanityCheck(int r, int c) const
@@ -124,18 +135,25 @@ public:
 
 protected:
 	friend class AddConflictingElements;
+
+	// Returns true if we've run out of options just now.
+	// In other words, it will return true if there are still other,
+	// or if the cell has been set to be blank *previously*.
 	bool setOneConflictingElement(int r, int c, value_type value)
 	{
 		m_conflicts[r*NUM_COLUMNS + c].add(value);
-		return isBlank(r, c) || ! m_conflicts[r*NUM_COLUMNS + c].isFull();
+		return ((! m_conflicts[r*NUM_COLUMNS + c].isFull()) || isBlank(r, c));
 	}
 
-	bool addConflictingElements(int r, int c, int value);
-
+	int markConflictingElements(int r, int c, int value);
+	
 	CellValueSet recomputeConflictingElements(int r, int c) const;
 
 private:
+	// "Empty" means "hasn't been set yet, may be set in the future".
 	static const value_type EMPTY = static_cast<value_type>(-1);
+
+	// "Blank" means "set to a non-numeric blank square".
 	static const value_type BLANK = static_cast<value_type>(-2);
 
 private:

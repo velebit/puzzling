@@ -9,27 +9,31 @@ class AddConflictingElements
 {
 public:
 	AddConflictingElements(Grid& grid, int value)
-		: m_grid(grid), m_value(value), m_okay(true) {};
+		: m_grid(grid), m_value(value), m_numNewBlanks(0) {};
 
 	void operator() (int r, int c)
 	{
 		if (! m_grid.setOneConflictingElement(r, c, m_value))
-			m_okay = false;
+		{
+			assert(! m_grid.isBlank(r, c));
+			m_grid.setToBlank(r, c);
+			++m_numNewBlanks;
+		}
 	}
 
-	bool isFullGridPossible() const { return m_okay; }
+	int getNumNewBlanks() const { return m_numNewBlanks; }
 
 private:
-	Grid& m_grid;
-	int   m_value;
-	bool  m_okay;
+	Grid&     m_grid;
+	const int m_value;
+	int       m_numNewBlanks;
 };
 
-bool Grid::addConflictingElements(int r, int c, int value)
+int Grid::markConflictingElements(int r, int c, int value)
 {
 	AddConflictingElements addConflicts(*this, value);
 	forOthersInLines(r, c, addConflicts);
-	return addConflicts.isFullGridPossible();
+	return addConflicts.getNumNewBlanks();
 }
 
 // ============================================================
@@ -41,7 +45,7 @@ public:
 
 	void operator() (int r, int c)
 	{
-		if (m_grid.isSet(r, c))
+		if (m_grid.hasValue(r, c))
 		{
 			m_set.add(m_grid.get(r, c));
 		}
@@ -71,9 +75,13 @@ std::ostream& operator<< (std::ostream& stream, const Grid& grid)
 		for (int c = 0;  c < Grid::NUM_COLUMNS;  ++c)
 		{
 			stream.width(2);
-			if (! grid.isSet(r, c))
+			if (grid.isEmpty(r, c))
 			{
 				stream << ".";
+			}
+			else if (grid.isBlank(r, c))
+			{
+				stream << "~";
 			}
 			else
 			{

@@ -23,10 +23,11 @@ else
   endif
 endif
 
-#DEBUGFLAGS  := -O3
-DEBUGFLAGS  := -g
+DEBUGFLAGS  := -O3 -DNDEBUG
+#DEBUGFLAGS  := -g
+#DEBUGFLAGS  := -g -pg
 CCFLAGS     := $(ARCHCCFLAGS) $(DEBUGFLAGS) -Wall
-LDFLAGS     := $(ARCHLDFLAGS) -lm
+LDFLAGS     := $(ARCHLDFLAGS) $(DEBUGFLAGS) -lm
 
 BIN_NAMES   := solve_grid test_set test_grid
 BINARIES    := $(BIN_NAMES:%=%$(BINEXT))

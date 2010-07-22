@@ -12,6 +12,7 @@ using std::endl;
 
 std::vector<Location> g_locationSequence;
 std::vector<Grid>     g_gridStack;
+int                   g_bestBlanksSoFar = 3;
 
 static void maybeAddToLocationSequence(Grid& g, Location loc, int value)
 {
@@ -112,11 +113,23 @@ static int countBlanks(const Grid& g)
 	return count;
 }
 
-static void trySomeNumbers(int depth, int blankBudget)
+static void trySomeNumbers(int depth, int blanks)
 {
 	if (depth == (int) g_locationSequence.size())
 	{
-		cout << "*** SOLUTION ***" << endl;
+		if (blanks > g_bestBlanksSoFar)
+		{
+			return;
+		}
+		else if (blanks == g_bestBlanksSoFar)
+		{
+			cout << "*** SOLUTION (tied = " << blanks << ") ***" << endl;
+		}
+		else
+		{
+			cout << "*** SOLUTION (new best = " << blanks << ") ***" << endl;
+			g_bestBlanksSoFar = blanks;
+		}
 		cout << g_gridStack[depth] << endl;
 		return;
 	}
@@ -135,7 +148,7 @@ static void trySomeNumbers(int depth, int blankBudget)
 	{
 		g_gridStack[depth+1] = g_gridStack[depth];
 		// this blank was already accounted for-- the budget stays the same
-		trySomeNumbers(depth+1, blankBudget);
+		trySomeNumbers(depth+1, blanks);
 		return;
 	}
 	assert(g_gridStack[depth].isEmpty(r, c));
@@ -148,21 +161,20 @@ static void trySomeNumbers(int depth, int blankBudget)
 		if (gOld.canBeSetTo(r, c, i))
 		{
 			gNew = gOld;
-			int extraBlanks = gNew.set(r, c, i);
-			assert(countBlanks(gNew) == (extraBlanks + (3 - blankBudget)));
-			if (extraBlanks > blankBudget)
+			int updatedBlanks = blanks + gNew.set(r, c, i);
+			//assert(countBlanks(gNew) == updatedBlanks);
+			if (updatedBlanks > g_bestBlanksSoFar)
 				continue;
-			//if (depth >= 50)
-			//	cout << gNew << endl;
-			trySomeNumbers(depth+1, blankBudget - extraBlanks);
+			trySomeNumbers(depth+1, updatedBlanks);
 		}
 	}
 
-	if (blankBudget > 0)
+	if (blanks < g_bestBlanksSoFar)
 	{
 		gNew = gOld;
 		gNew.setToBlank(r, c);
-		trySomeNumbers(depth+1, blankBudget-1);
+		//assert(countBlanks(gNew) == blanks+1);
+		trySomeNumbers(depth+1, blanks+1);
 	}
 }
 
@@ -171,5 +183,5 @@ int main(int argc, char** argv)
 	buildLocationSequence();
 	buildInitialGrid();
 	cout << g_gridStack[0] << endl;
-	trySomeNumbers(0, 3);
+	trySomeNumbers(0, 0);
 }

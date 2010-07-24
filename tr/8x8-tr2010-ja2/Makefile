@@ -49,7 +49,7 @@ veryclean: clean
 .SECONDEXPANSION:
 ## The second expansion makes it easy to specify extra objects for each binary:
 OBJS_solve_grid			:= $(patsubst %,$(OBJDIR)/%.o, \
-	Grid )
+	Grid LocationSequence )
 OBJS_test_set			:= $(patsubst %,$(OBJDIR)/%.o, \
 	)
 OBJS_test_grid			:= $(patsubst %,$(OBJDIR)/%.o, \

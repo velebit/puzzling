@@ -3,7 +3,7 @@
 
 #include "Grid.h"
 #include "Location.h"
-#include "LocationSequenceBuilder.h"
+#include "LocationSequence.h"
 
 #include <iostream>
 #include <vector>
@@ -11,28 +11,33 @@
 class GridSolver
 {
 private:
-	std::vector<Location> m_locationSequence;
-	std::vector<Grid>     m_gridStack;
-	int                   m_bestBlanksSoFar;
+	const std::vector<Location>& m_locationSequence;
+	std::vector<Grid>            m_gridStack;
+	int                          m_finalDepth;
+	int                          m_maxAllowedBlanks;
 
 public:
 	GridSolver(int maxBlanks = 9999)
-		: m_locationSequence(LocationSequenceBuilder().getLocations()),
-		  m_bestBlanksSoFar(maxBlanks)
+		: m_locationSequence(LocationSequence::get()),
+		  m_finalDepth(0),
+		  m_maxAllowedBlanks(maxBlanks)
 	{
+		m_finalDepth = static_cast<int>( m_locationSequence.size() );
 		buildInitialGrid();
 		std::cout << m_gridStack[0] << std::endl;
 	}
 
+	~GridSolver() {};
+
 	void solve()
 	{
-		trySomeNumbers(0, 0);
+		trySomeNumbers(0, 0, countBlanks(m_gridStack[0]));
 	}
 
 private:
 	void buildInitialGrid()
 	{
-		m_gridStack.resize(m_locationSequence.size() + 1);
+		m_gridStack.resize(m_finalDepth + 1);
 
 		Grid& g = m_gridStack[0];
 
@@ -61,42 +66,48 @@ private:
 		return count;
 	}
 
-	void trySomeNumbers(int depth, int blanks)
+	void foundResult(const Grid& grid, int blanks)
 	{
-		if (depth == (int) m_locationSequence.size())
+		if (blanks > m_maxAllowedBlanks)
 		{
-			if (blanks > m_bestBlanksSoFar)
-			{
-				return;
-			}
-			else if (blanks == m_bestBlanksSoFar)
-			{
-				std::cout << "*** SOLUTION (tied = " << blanks << ") ***" << std::endl;
-			}
-			else
-			{
-				std::cout << "*** SOLUTION (new best = " << blanks << ") ***" << std::endl;
-				m_bestBlanksSoFar = blanks;
-			}
-			std::cout << m_gridStack[depth] << std::endl;
+			return;
+		}
+		else if (blanks == m_maxAllowedBlanks)
+		{
+			std::cout << "*** SOLUTION (tied = " << blanks << ") ***" << std::endl;
+		}
+		else
+		{
+			std::cout << "*** SOLUTION (new best = " << blanks << ") ***" << std::endl;
+			m_maxAllowedBlanks = blanks;
+		}
+		std::cout << grid << std::endl;
+	}
+
+	void trySomeNumbers(int depth, int locationIndex, int blanks)
+	{
+		if (depth == m_finalDepth)
+		{
+			foundResult(m_gridStack[depth], blanks);
 			return;
 		}
 
-		assert(depth < (int) m_locationSequence.size());
 		if (depth <= 6) // || depth >= 40)
 		{
-			std::cout.width(depth+2);
-			std::cout << depth << std::endl;
+			std::cout.width(depth+3);
+			std::cout << locationIndex << std::endl;
 		}
 
-		const int r = m_locationSequence[depth].row();
-		const int c = m_locationSequence[depth].column();
+		//assert(depth < m_finalDepth);
+		assert(locationIndex < m_locationSequence.size());
+		const int r = m_locationSequence[locationIndex].row();
+		const int c = m_locationSequence[locationIndex].column();
 
 		if (m_gridStack[depth].isBlank(r, c))
 		{
 			m_gridStack[depth+1] = m_gridStack[depth];
 			// this blank was already accounted for-- the budget stays the same
-			trySomeNumbers(depth+1, blanks);
+			trySomeNumbers(depth+1, locationIndex+1, blanks);
 			return;
 		}
 		assert(m_gridStack[depth].isEmpty(r, c));
@@ -111,18 +122,18 @@ private:
 				gNew = gOld;
 				int updatedBlanks = blanks + gNew.set(r, c, i);
 				//assert(countBlanks(gNew) == updatedBlanks);
-				if (updatedBlanks > m_bestBlanksSoFar)
+				if (updatedBlanks > m_maxAllowedBlanks)
 					continue;
-				trySomeNumbers(depth+1, updatedBlanks);
+				trySomeNumbers(depth+1, locationIndex+1, updatedBlanks);
 			}
 		}
 
-		if (blanks < m_bestBlanksSoFar)
+		if (blanks < m_maxAllowedBlanks)
 		{
 			gNew = gOld;
 			gNew.setToBlank(r, c);
 			//assert(countBlanks(gNew) == blanks+1);
-			trySomeNumbers(depth+1, blanks+1);
+			trySomeNumbers(depth+1, locationIndex+1, blanks+1);
 		}
 	}
 };

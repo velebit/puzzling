@@ -40,7 +40,7 @@ private:
 
 		for (int i = 0;  i < numCols;  ++i)
 		{
-			m_bookkeepingGrid.setRaw(numRows-1,i, 1);
+			maybeAddToLocationSequence(Location(numRows-1, i), 1);
 		}
 		for (int i = 0;  i < numCols;  ++i)
 		{

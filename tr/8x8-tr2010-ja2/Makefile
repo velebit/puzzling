@@ -23,8 +23,9 @@ else
   endif
 endif
 
-DEBUGFLAGS  := -O3 -DNDEBUG -Wall
-#DEBUGFLAGS  := -g -Wall
+#DEBUGFLAGS  := -O3 -DNDEBUG -Wall
+#DEBUGFLAGS  := -O3 -Wall
+DEBUGFLAGS  := -g -Wall
 #DEBUGFLAGS  := -g -pg -Wall
 CCFLAGS     := $(ARCHCCFLAGS) $(DEBUGFLAGS)
 LDFLAGS     := $(ARCHLDFLAGS) $(DEBUGFLAGS) -lm

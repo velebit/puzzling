@@ -86,8 +86,9 @@ private:
 
 	void trySomeNumbers(int depth, int locationIndex, int blanks)
 	{
-		if (depth == m_finalDepth)
+		if (locationIndex == static_cast<int>(m_locationSequence.size()))
 		{
+			// no more depth; we are done
 			foundResult(m_gridStack[depth], blanks);
 			return;
 		}
@@ -98,7 +99,7 @@ private:
 			std::cout << locationIndex << std::endl;
 		}
 
-		//assert(depth < m_finalDepth);
+		assert(depth+1 < m_gridStack.size());
 		assert(locationIndex < m_locationSequence.size());
 		const int r = m_locationSequence[locationIndex].row();
 		const int c = m_locationSequence[locationIndex].column();

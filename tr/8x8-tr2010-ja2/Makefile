@@ -23,13 +23,13 @@ else
   endif
 endif
 
-DEBUGFLAGS  := -O3 -DNDEBUG
-#DEBUGFLAGS  := -g
-#DEBUGFLAGS  := -g -pg
-CCFLAGS     := $(ARCHCCFLAGS) $(DEBUGFLAGS) -Wall
+DEBUGFLAGS  := -O3 -DNDEBUG -Wall
+#DEBUGFLAGS  := -g -Wall
+#DEBUGFLAGS  := -g -pg -Wall
+CCFLAGS     := $(ARCHCCFLAGS) $(DEBUGFLAGS)
 LDFLAGS     := $(ARCHLDFLAGS) $(DEBUGFLAGS) -lm
 
-BIN_NAMES   := solve_grid test_set test_grid
+BIN_NAMES   := solve_grid test_set test_grid test_mutex
 BINARIES    := $(BIN_NAMES:%=%$(BINEXT))
 
 OBJDIR      := objs/$(ARCHNAME)
@@ -50,8 +50,6 @@ veryclean: clean
 ## The second expansion makes it easy to specify extra objects for each binary:
 OBJS_solve_grid			:= $(patsubst %,$(OBJDIR)/%.o, \
 	Grid LocationSequence )
-OBJS_test_set			:= $(patsubst %,$(OBJDIR)/%.o, \
-	)
 OBJS_test_grid			:= $(patsubst %,$(OBJDIR)/%.o, \
 	Grid )
 

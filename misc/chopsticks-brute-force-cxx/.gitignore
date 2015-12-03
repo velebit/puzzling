@@ -1,0 +1,4 @@
+chop
+chop_dbg
+*.o
+*.d

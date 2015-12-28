@@ -5,7 +5,7 @@ CXX := g++44
 endif
 
 #CXXFLAGS_COMMON := -std=gnu++11
-CXXFLAGS_COMMON := -std=gnu++0x
+CXXFLAGS_COMMON := -std=gnu++0x -Wall -Wextra
 CXXFLAGS_OPT := -g -O3 $(CXXFLAGS_COMMON)
 CXXFLAGS_DBG := -g -O0 -DDEBUG $(CXXFLAGS_COMMON)
 

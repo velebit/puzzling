@@ -45,6 +45,7 @@ Hands & Hands::operator=(const Hands & other)
 	m_high = other.m_high;
 	m_low = other.m_low;
 	check();
+	return *this;
 }
 
 Fingers Hands::high() const

@@ -25,6 +25,7 @@ Fingers & Fingers::operator=(const Fingers & other)
 {
 	m_fingers = other.m_fingers;
 	check();
+	return *this;
 }
 
 Fingers::Value Fingers::get() const

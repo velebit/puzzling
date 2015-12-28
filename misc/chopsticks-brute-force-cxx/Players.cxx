@@ -37,6 +37,7 @@ Players & Players::operator=(const Players & other)
 	m_next = other.m_next;
 	m_other = other.m_other;
 	check();
+	return *this;
 }
 
 Hands Players::next() const

@@ -79,19 +79,30 @@ def quiverable(result):
 
 def main():
     solution = solve()
-
     x, y, u, v = quiverable(arrows(solution))
-    q = plt.quiver(x, y, u, v, scale=1., scale_units='xy', angles='xy')
+
+    plt.quiver(x, y, u, v, scale=1., scale_units='xy', angles='xy')
     plt.xlim((-0.5, 7.5))
     plt.ylim((-110, 110))
     plt.savefig('riddler-20160930-classic-cubs-betting.blank.png')
+
+    qc = plt.quiver(x[0::2], y[0::2], u[0::2], v[0::2], color='blue',
+                    scale=1., scale_units='xy', angles='xy')
+    qs = plt.quiver(x[1::2], y[1::2], u[1::2], v[1::2], color='red',
+               scale=1., scale_units='xy', angles='xy')
+    plt.xlim((-0.5, 7.5))
+    plt.ylim((-110, 110))
+
     plt.xlabel('games played')
     plt.ylabel('total winnings')
-    plt.savefig('riddler-20160930-classic-cubs-betting.with-axes.png')
-
     for a in annotations(solution):
         plt.annotate(a['text'], xy=a['xy'], xytext=a['xytext'],
                      verticalalignment='center')
+    #plt.legend()
+    plt.annotate('$ amounts show bet size', xy=(-0.25,95),
+                 verticalalignment='bottom')
+    plt.quiverkey(qc, 0.25, 75, 1, 'Cubs win', coordinates='data')
+    plt.quiverkey(qs, 0.25, 55, 1, 'Sox win', coordinates='data')
     plt.savefig('riddler-20160930-classic-cubs-betting.with-bets.png')
 
     plt.show()

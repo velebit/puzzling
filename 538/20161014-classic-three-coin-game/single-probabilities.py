@@ -22,9 +22,13 @@ for i in range(SIZE):
 
 cumulative = all_steps.sum(axis=1)
 
-print(cumulative.flat[-2])
-print(cumulative.flat[-1])
-print(6/(1+2+3+4+5+6))
+expected = 6/(1+2+3+4+5+6)
+eps = 0.005*expected
+for i in np.nonzero(np.fabs(cumulative - expected).flat >= eps)[0]:
+    if i > 0:
+        print("%4d: %9.6f %9.6f" %
+              (i, np.asscalar(cumulative[i]),
+               np.asscalar((cumulative[i] / expected) - 1)))
 
 mp.plot(cumulative[:50], marker='o')
 mp.title('Probability of landing on a given space')

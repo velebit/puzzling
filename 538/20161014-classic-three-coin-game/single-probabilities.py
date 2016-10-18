@@ -30,7 +30,7 @@ for i in np.nonzero(np.fabs(cumulative - expected).flat >= eps)[0]:
               (i, np.asscalar(cumulative[i]),
                np.asscalar((cumulative[i] / expected) - 1)))
 
-mp.plot(cumulative[:50], marker='o')
+mp.plot(cumulative[:21], marker='o')
 mp.title('Probability of landing on a given space')
 mp.xlabel('space number')
 mp.ylabel('probability')
@@ -39,7 +39,7 @@ mp.show()
 
 markers=('o', '+', 'x', '*')
 for i in range(1, 6*len(markers)+1):
-    mp.plot(all_steps[i,:10].T, marker=markers[int((i-1)/6)], label=i)
+    mp.plot(all_steps[i,:11].T, marker=markers[int((i-1)/6)], label=i)
 mp.title('Probability of landing on a space in a particular move')
 mp.xlabel('move number')
 mp.ylabel('probability')

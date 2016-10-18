@@ -37,6 +37,15 @@ mp.ylabel('probability')
 mp.savefig('20161014-classic-space-probability.png')
 mp.show()
 
+mp.plot((cumulative / expected) - 1, marker='o')
+mp.title('Convergence of landing on a given space')
+mp.xlabel('space number')
+mp.ylabel('relative difference from probability limit')
+mp.xlim((10,50))
+mp.ylim((-0.005,0.005))
+mp.savefig('20161014-classic-space-probability-convergence.png')
+mp.show()
+
 markers=('o', '+', 'x', '*')
 for i in range(1, 6*len(markers)+1):
     mp.plot(all_steps[i,:11].T, marker=markers[int((i-1)/6)], label=i)

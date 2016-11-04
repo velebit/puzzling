@@ -3,30 +3,41 @@
 #import math
 import sys
 
-with open('grid-5x5.txt') as file:
-    grid_data = [[(char == 'B') for char in line.strip()]
-                 for line in file.readlines()]
-grid = [x for row in grid_data for x in row]
+GRID_DATA = None
+GRID_FLAT = None
+ROWS = 0
+COLS = 0
+CELLS = 0
+
+def load_grid(file_name):
+    global GRID_DATA, GRID_FLAT, ROWS, COLS, CELLS
+    with open(file_name) as file:
+        GRID_DATA = [[(char == 'B') for char in line.strip()]
+                     for line in file.readlines()]
+    GRID_FLAT = [x for row in GRID_DATA for x in row]
+    ROWS = len(GRID_DATA)
+    COLS = len(GRID_DATA[0])
+    CELLS = ROWS*COLS
 
 def dump_bool(flat):
-    for i in range(5):
-        row = map(lambda x: ('*' if x else '.'), flat[5*i:5*(i+1)])
+    for i in range(ROWS):
+        row = map(lambda x: ('*' if x else '.'), flat[COLS*i:COLS*(i+1)])
         print("".join(row))
     print()
 
 def ix(p):
-    return p[0]+5*p[1]
+    return COLS*p[0]+p[1]
 
 def neighbors(p):
-    (x,y) = p
-    if y > 0:
-        yield (x,y-1)
-    if x < 4:
-        yield (x+1,y)
-    if y < 4:
-        yield (x,y+1)
-    if x > 0:
-        yield (x-1,y)
+    (r,c) = p
+    if r > 0:
+        yield (r-1,c)
+    if c < (COLS-1):
+        yield (r,c+1)
+    if r < (ROWS-1):
+        yield (r+1,c)
+    if c > 0:
+        yield (r,c-1)
 
 def generate_blobs(points, blob, forbidden, size):
     size -= 1
@@ -60,7 +71,7 @@ def generate_blobs(points, blob, forbidden, size):
                 blob[iq] = False
 
 def blobs(p, size, forbidden=None):
-    blob = [False] * 25
+    blob = [False] * CELLS
     blob[ix(p)] = True
     if forbidden is None:
         forbidden = list(blob)
@@ -70,22 +81,27 @@ def blobs(p, size, forbidden=None):
     p_neighbors = len(list(neighbors(p)))
     return generate_blobs({p: p_neighbors}, blob, forbidden, size-1)
 
-def count_blue(blob):
+def count_blue(blob, grid=None):
+    if grid is None:
+        grid = GRID_FLAT
     return sum((1 for x in zip(blob, grid) if all(x)))
 
 def find_allowed(forbidden):
-    for i in range(5):
-        for j in range(i,5):
-            if not forbidden[ix((j, i))]:
-                return (j, i)
-            if not forbidden[ix((i, j))]:
-                return (i, j)
+    for i in range(max(ROWS, COLS)):
+        for j in range(max(ROWS, COLS)):
+            if i < ROWS and j < COLS:
+                if not forbidden[ix((i, j))]:
+                    return (i, j)
+            if j < ROWS and i < COLS:
+                if not forbidden[ix((j, i))]:
+                    return (j, i)
     assert False
 
 def combine(*blobs):
     return [any(x) for x in zip(*(b for b in blobs if b is not None))]
 
 def find_solutions(solution=(), start=(0,0), levels=5, size=5, forbidden=None):
+    assert GRID_FLAT is not None
     for b in blobs(start, size, forbidden=forbidden):
         blue = count_blue(b)
         if blue == 0 or blue == 3:
@@ -99,6 +115,7 @@ def find_solutions(solution=(), start=(0,0), levels=5, size=5, forbidden=None):
                                           forbidden=next_forbidden)
 
 def main():
+    load_grid('grid-5x5.txt')
     count = 0
     for solution in find_solutions():
         print("--------------------")

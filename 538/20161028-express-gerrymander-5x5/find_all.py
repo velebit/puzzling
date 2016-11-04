@@ -4,9 +4,9 @@
 import sys
 
 with open('grid-5x5.txt') as file:
-    data = [[(char == 'B') for char in line.strip()]
-            for line in file.readlines()]
-flat = [x for row in data for x in row]
+    grid_data = [[(char == 'B') for char in line.strip()]
+                 for line in file.readlines()]
+grid = [x for row in grid_data for x in row]
 
 def dump_bool(flat):
     for i in range(5):
@@ -28,27 +28,23 @@ def neighbors(p):
     if x > 0:
         yield (x-1,y)
 
-def generate_blobs(points, blob, acceptable, size):
+def generate_blobs(points, blob, forbidden, size):
     size -= 1
-    points_iter = points.keys()  # can't iterate over modified dict
-    points = dict(points)  # backtracking directly is too complex, so push/ppop
-    acceptable = list(acceptable)
+    points_iter = iter(points.keys())  # can't iterate over modified dict
+    points = dict(points)  # backtracking directly is too complex, so push/pop
+    forbidden = list(forbidden)
     for p in points_iter:
         for q in neighbors(p):
             iq = ix(q)
-            if acceptable[iq]:
+            if not forbidden[iq]:
                 blob[iq] = True
-                acceptable[iq] = False
+                forbidden[iq] = True
                 if size > 0:
                     q_neighbors = 0
                     for r in neighbors(q):
-                        if acceptable[ix(r)]:
+                        if not forbidden[ix(r)]:
                             q_neighbors += 1
                         if r in points:
-                            r_neighbors = 0
-                            for s in neighbors(r):
-                                if acceptable[ix(s)]:
-                                    r_neighbors += 1
                             if points[r] > 1:
                                 points[r] -= 1
                             else:
@@ -56,28 +52,60 @@ def generate_blobs(points, blob, acceptable, size):
                     if q_neighbors > 0:
                         points[q] = q_neighbors
                     yield from generate_blobs(points, blob,
-                                              acceptable, size)
+                                              forbidden, size)
                     if q in points:
                         del points[q]
                 else:
                     yield blob
                 blob[iq] = False
 
-def blobs(p, size):
+def blobs(p, size, forbidden=None):
     blob = [False] * 25
     blob[ix(p)] = True
-    acceptable = [not p for p in blob]
+    if forbidden is None:
+        forbidden = list(blob)
+    else:
+        forbidden = list(forbidden)
+        forbidden[ix(p)] = True
     p_neighbors = len(list(neighbors(p)))
-    return generate_blobs({p: p_neighbors}, blob, acceptable, size-1)
+    return generate_blobs({p: p_neighbors}, blob, forbidden, size-1)
 
-count = 0
-for b in blobs((0,0), 5):
-    count += 1
-    dump_bool(b)
-print(count)
+def count_blue(blob):
+    return sum((1 for x in zip(blob, grid) if all(x)))
 
-count = 0
-for b in blobs((0,0), 25):
-    count += 1
-    dump_bool(b)
-print(count)
+def find_allowed(forbidden):
+    for i in range(5):
+        for j in range(i,5):
+            if not forbidden[ix((j, i))]:
+                return (j, i)
+            if not forbidden[ix((i, j))]:
+                return (i, j)
+    assert False
+
+def combine(*blobs):
+    return [any(x) for x in zip(*(b for b in blobs if b is not None))]
+
+def find_solutions(solution=(), start=(0,0), levels=5, size=5, forbidden=None):
+    for b in blobs(start, size, forbidden=forbidden):
+        blue = count_blue(b)
+        if blue == 0 or blue == 3:
+            if levels <= 1:
+                yield solution + (b,)
+            else:
+                next_forbidden = combine(forbidden, b)
+                next_start = find_allowed(next_forbidden)
+                yield from find_solutions(solution + (b,), start=next_start,
+                                          levels=levels-1, size=size,
+                                          forbidden=next_forbidden)
+
+def main():
+    count = 0
+    for solution in find_solutions():
+        print("--------------------")
+        for b in solution:
+            dump_bool(b)
+        count += 1
+    print(count)
+
+if __name__ == '__main__':
+    main()

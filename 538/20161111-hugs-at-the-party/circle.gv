@@ -1,0 +1,18 @@
+graph {
+    node [shape=circle];
+    H0 [label="", fixedsize=true];
+    H1 [label="", fixedsize=true];
+    H2 [label="", fixedsize=true];
+    H3 [label="", fixedsize=true];
+    H4 [label="", fixedsize=true];
+    H5 [label="", fixedsize=true];
+    H6 [label="", fixedsize=true];
+    H7 [label="", fixedsize=true];
+    H8 [label="", fixedsize=true];
+    M [label="", fixedsize=true];
+    node [style=invis];
+    sp0; sp1; sp2; sp3; sp4;
+    edge [style=invis];
+    H0 -- sp0 -- H7 -- H1 -- sp1 -- H6 -- H2 -- sp2 -- H5 -- H3 -- sp3 --
+       H4 -- M -- sp4 -- H8 -- H0;
+}

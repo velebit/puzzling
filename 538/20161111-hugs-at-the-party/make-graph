@@ -1,0 +1,41 @@
+#!/bin/sh
+
+graph () {
+    neato circle.gv \
+	| perl -0777 -pe 's/^\s+(?:sp\d|\w+\s+--).*?;\s*\n//msg;\
+                           s/^\}/    edge [style=""];/m'
+    for i in "$@"; do
+	cat edges"$i".frag.gv
+    done
+    echo '}'
+}
+
+graph_png () {
+    graph "$@" | neato -n -Tpng
+}
+
+rm -f frame*.png
+graph_png                      > frame000.png
+graph_png                      > frame001.png
+graph_png 8                    > frame010.png
+graph_png 8 0                  > frame020.png
+graph_png 8 0 7                > frame030.png
+graph_png 8 0 7 1              > frame040.png
+graph_png 8 0 7 1 6            > frame050.png
+graph_png 8 0 7 1 6 2          > frame060.png
+graph_png 8 0 7 1 6 2 5        > frame070.png
+graph_png 8 0 7 1 6 2 5 3      > frame080.png
+graph_png 8 0 7 1 6 2 5 3 M 4  > frame090.png
+graph_png 8 0 7 1 6 2 5 3 M 4d > frame100.png
+graph_png 8 0 7 1 6 2 5 3 M 4d > frame101.png
+graph_png 8 0 7 1 6 2 5 3 M 4d > frame102.png
+
+rm -f *.gif
+# '-delay 3x4' means hold each frame for 3/4 of a second
+convert -loop 0 -delay 3x4 -dispose none frame*.png \
+	-coalesce -layers Optimize hugs-at-the-party.gif
+
+rm -f frame*.png
+
+#rm -f xframe*.png
+#convert hugs-at-the-party.gif xframe.png

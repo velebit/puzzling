@@ -1,0 +1,160 @@
+First of all, thank you very much for the challenge!  I might not be
+eligible for the actual contest (I'm not a British resident), but I
+had a lot of fun fighting with this.
+
+The two lists contain movie actors and actresses in (plaintext-wise)
+alphabetical order:
+
+            ---MEN---                            ---WOMEN---
+Humphrey Bogart   (KCRVKXHL EUJDXZ)   Lauren Bacall       (TVFAMI WVYVTT)
+Richard Burton     (WKNJVWL GSWOXU)   Kim Basinger         (KHP FNWHQBEV)
+Sean Connery         (HYUE WREEYCS)   Ingrid Bergman     (MTJXMG EHXJRDT)
+Tony Curtis           (QFDX ORNQTP)   Honor Blackman     (ORERC VIUWFNUE)
+Albert Finney       (VTWMAC UEIIML)   Marlene Dietrich (AIKUSBS EHSMKHNR)
+Harrison Ford       (OFIIPTYX LYIJ)   Kirsten Dunst       (UQPIDJX HEXID)
+Alec Guinness       (ZGRT BPDIIRNN)   Carrie Fisher       (TZMMDR WDNCRM)
+Rex Harrison         (XCT GSXXJYUQ)   Jodie Foster         (ECWHX YCMBXA)
+Anthony Hopkins   (RNBTCNP TCOSHNM)   Judy Garland         (LRNU FHZOHVN)
+John Hurt               (XIVL VFBD)   Linda Hamilton     (YVTLG UGZVYNHT)
+Charles Laughton (NRIKUSL UIQORMDB)   Audrey Hepburn     (YAERFI KFXBARV)
+Jack Lemmon           (UFIV WKXXZY)   Katharine Hepburn
+Tobey Maguire       (DYFJN WCLEQPJ)                   (OUGEUDLRZ EZBVJDR)
+Ewan McGregor       (LVZD CONKLNFK)   Scarlett Johansson
+Bill Murray           (PZSS TEBBMJ)                  (CQMBSVDD LNYMICCNI)
+Peter O'Toole       (BZGZD A'GAANZ)   Nicole Kidman       (DGOFBL AGUCZD)
+Gregory Peck         (JRFJWRI XFCS)   Shirley MacLaine (AQSEWKC XFIWFSYK)
+Mickey Rooney       (QJAMDU ZWWVDU)   Kelly McGillis     (RKUUC VHMPUUPT)
+Arnold Schwarzenegger                 Marilyn Monroe     (CZNTBXD CFDNFE)
+            (GMTHYL IKUBGMFPTPSSPM)   Margaret Rutherford
+Kevin Spacey         (KEZHQ WSNIEC)                 (OSXFSXCZ XBZGCXDUXA)
+                                      Elizabeth Taylor (BQKDVGBOJ OVIQXW)
+                                      Sigourney Weaver (CWUIFBLSK HSOGSB)
+
+Each of the names is encrypted using a simple substitution cipher.
+The ciphertext alphabet order for each cipher is formed, starting from
+the title of a movie, by removing duplicate letters, adding the unused
+letters in order, and shifting the alphabet (as in the June puzzle).
+
+The connection between the women and the men is that one actor and one
+actress share each cipher.  The shared cipher is always based on the
+title of a movie that both people acted in.  Note, however, that the
+connection really is ciphers rather than movies: in a few cases, a
+third person from the lists acted in one of the movies, but they will
+get encrypted with a cipher from some other movie they acted in.
+
+Here is a list of all the actor/actress pairs, ciphertext alphabets
+used to encrypt them, and the movies used for cipher keys:
+
+Mickey Rooney                         Judy Garland
+           HBANDCFGJLMOQVWXYZSTRIKEUP
+           Strike Up the Band  (1940)
+
+Humphrey Bogart                     Ingrid Bergman
+           DEFGHIJKMOPQRTUVWXYZCASBLN
+               Casablanca  (1942)
+
+Rex Harrison                   Margaret Rutherford
+           SPRACDFGJKMNOQUVWXYZBLITHE
+              Blithe Spirit  (1945)
+
+Gregory Peck                        Audrey Hepburn
+           YBCEFGJKPQSTUVWXZROMANHLID
+              Roman Holiday  (1953)
+
+Charles Laughton                  Marlene Dietrich
+           ITNESFORHPCUABDGJKLMQVXYZW
+       Witness for the Prosecution  (1957)
+
+Tony Curtis                         Marilyn Monroe
+           ZSOMELIKTHABCDFGJNPQRUVWXY
+            Some Like It Hot  (1959)
+
+Jack Lemmon                       Shirley MacLaine
+           FGIJKLOQSUVWXYZTHEAPRMNBCD
+              The Apartment  (1960)
+
+Sean Connery                        Honor Blackman
+           UVWXYZGOLDFINERABCHJKMPQST
+               Goldfinger  (1964)
+
+Richard Burton                    Elizabeth Taylor
+           VGNLBCEJKMPQTUXYZWHOSAFRID
+     Who's Afraid of Virginia Woolf?  (1966)
+
+Peter O'Toole                    Katharine Hepburn
+           UVXYZTHELIONWRABCDFGJKMPQS
+           The Lion in Winter  (1968)
+
+Albert Finney                        Lauren Bacall
+           VWYZMURDEONTHIXPSABCFGJKLQ
+      Murder on the Orient Express  (1974)
+
+Alec Guinness                        Carrie Fisher
+           ZSTARWBCDEFGHIJKLMNOPQUVXY
+                Star Wars  (1977)
+
+John Hurt                         Sigourney Weaver
+           OPQRSTUVWXYZALIENBCDFGHJKM
+                  Alien  (1979)
+
+Arnold Schwarzenegger               Linda Hamilton
+           GJKLPQSUVWXYZTHERMINAOBCDF
+             The Terminator  (1984)
+
+Harrison Ford                       Kelly McGillis
+           FGHJKLMOPQRUVXYZWITNESABCD
+                 Witness  (1985)
+
+Anthony Hopkins                       Jodie Foster
+           RUVWXYZTHESILNCOFAMBDGJKPQ
+        The Silence of the Lambs  (1991)
+
+Kevin Spacey                          Kim Basinger
+           NFIDETBGHJKMPQRSUVWXYZLACO
+            L.A. Confidential  (1997)
+
+Ewan McGregor                        Nicole Kidman
+           ZMOULINRGEABCDFHJKPQSTVWXY
+              Moulin Rouge!  (2001)
+
+Tobey Maguire                        Kirsten Dunst
+           CFGHJKLOQTUVWXYZSPIDERMANB
+               Spider-Man  (2002)
+
+Bill Murray                     Scarlett Johansson
+           MPQUVWXYZLOSTINRABCDEFGHJK
+           Lost in Translation  (2003)
+
+Finally, if we arrange the ciphertext alphabets in the order in which
+the corresponding movies were released (as above), the secret quote
+can be found diagonally starting in the top left corner:
+
+(H)B A N D C F G J L M O Q V W X Y Z S T R I K E U P
+ D(E)F G H I J K M O P Q R T U V W X Y Z C A S B L N
+ S P(R)A C D F G J K M N O Q U V W X Y Z B L I T H E
+ Y B C(E)F G J K P Q S T U V W X Z R O M A N H L I D
+ I T N E(S)F O R H P C U A B D G J K L M Q V X Y Z W
+ Z S O M E(L)I K T H A B C D F G J N P Q R U V W X Y
+ F G I J K L(O)Q S U V W X Y Z T H E A P R M N B C D
+ U V W X Y Z G(O)L D F I N E R A B C H J K M P Q S T
+ V G N L B C E J(K)M P Q T U X Y Z W H O S A F R I D
+ U V X Y Z T H E L(I)O N W R A B C D F G J K M P Q S
+ V W Y Z M U R D E O(N)T H I X P S A B C F G J K L Q
+ Z S T A R W B C D E F(G)H I J K L M N O P Q U V X Y
+ O P Q R S T U V W X Y Z(A)L I E N B C D F G H J K M
+ G J K L P Q S U V W X Y Z(T)H E R M I N A O B C D F
+ F G H J K L M O P Q R U V X(Y)Z W I T N E S A B C D
+ R U V W X Y Z T H E S I L N C(O)F A M B D G J K P Q
+ N F I D E T B G H J K M P Q R S(U)V W X Y Z L A C O
+ Z M O U L I N R G E A B C D F H J(K)P Q S T V W X Y
+ C F G H J K L O Q T U V W X Y Z S P(I)D E R M A N B
+ M P Q U V W X Y Z L O S T I N R A B C(D)E F G H J K
+
+This yields "Here's looking at you, kid"-- Humphrey Bogart's famous
+line from Casablanca.
+
+--Albert Dvornik
+
+P.S. Copious thanks are due to the Internet Movie Database
+     (www.IMDb.com) for providing a lot of plaintext names to attack
+     and the necessary cross-referencing information.

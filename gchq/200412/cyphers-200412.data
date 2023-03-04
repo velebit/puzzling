@@ -1,0 +1,202 @@
+$cyphers = {
+             'Harrison Ford' => [
+                                  'Witness',
+                                  'FGHJKLMOPQRUVXYZWITNESABCD',
+                                  '1985'
+                                ],
+             'Ewan McGregor' => [
+                                  'Moulin Rouge!',
+                                  'ZMOULINRGEABCDFHJKPQSTVWXY',
+                                  '2001'
+                                ],
+             'Peter O\'Toole' => [
+                                   'The Lion in Winter',
+                                   'UVXYZTHELIONWRABCDFGJKMPQS',
+                                   '1968'
+                                 ],
+             'Scarlett Johansson' => [
+                                       'Lost in Translation',
+                                       'MPQUVWXYZLOSTINRABCDEFGHJK',
+                                       '2003'
+                                     ],
+             'Honor Blackman' => [
+                                   'Goldfinger',
+                                   'UVWXYZGOLDFINERABCHJKMPQST',
+                                   '1964'
+                                 ],
+             'Sean Connery' => [
+                                 'Goldfinger',
+                                 'UVWXYZGOLDFINERABCHJKMPQST',
+                                 '1964'
+                               ],
+             'Katharine Hepburn' => [
+                                      'The Lion in Winter',
+                                      'UVXYZTHELIONWRABCDFGJKMPQS',
+                                      '1968'
+                                    ],
+             'Arnold Schwarzenegger' => [
+                                          'The Terminator',
+                                          'GJKLPQSUVWXYZTHERMINAOBCDF',
+                                          '1984'
+                                        ],
+             'Judy Garland' => [
+                                 'Strike Up the Band',
+                                 'HBANDCFGJLMOQVWXYZSTRIKEUP',
+                                 '1940'
+                               ],
+             'Marilyn Monroe' => [
+                                   'Some Like It Hot',
+                                   'ZSOMELIKTHABCDFGJNPQRUVWXY',
+                                   '1959'
+                                 ],
+             'Kim Basinger' => [
+                                 'L.A. Confidential',
+                                 'NFIDETBGHJKMPQRSUVWXYZLACO',
+                                 '1997'
+                               ],
+             'Jodie Foster' => [
+                                 'The Silence of the Lambs',
+                                 'RUVWXYZTHESILNCOFAMBDGJKPQ',
+                                 '1991'
+                               ],
+             'Nicole Kidman' => [
+                                  'Moulin Rouge!',
+                                  'ZMOULINRGEABCDFHJKPQSTVWXY',
+                                  '2001'
+                                ],
+             'Kirsten Dunst' => [
+                                  'Spider-Man',
+                                  'CFGHJKLOQTUVWXYZSPIDERMANB',
+                                  '2002'
+                                ],
+             'Jack Lemmon' => [
+                                'The Apartment',
+                                'FGIJKLOQSUVWXYZTHEAPRMNBCD',
+                                '1960'
+                              ],
+             'Albert Finney' => [
+                                  'Murder on the Orient Express',
+                                  'VWYZMURDEONTHIXPSABCFGJKLQ',
+                                  '1974'
+                                ],
+             'Carrie Fisher' => [
+                                  'Star Wars',
+                                  'ZSTARWBCDEFGHIJKLMNOPQUVXY',
+                                  '1977'
+                                ],
+             'Tony Curtis' => [
+                                'Some Like It Hot',
+                                'ZSOMELIKTHABCDFGJNPQRUVWXY',
+                                '1959'
+                              ],
+             'Gregory Peck' => [
+                                 'Roman Holiday',
+                                 'YBCEFGJKPQSTUVWXZROMANHLID',
+                                 '1953'
+                               ],
+             'Humphrey Bogart' => [
+                                    'Casablanca',
+                                    'DEFGHIJKMOPQRTUVWXYZCASBLN',
+                                    '1942'
+                                  ],
+             'Elizabeth Taylor' => [
+                                     'Who\'s Afraid of Virginia Woolf?',
+                                     'VGNLBCEJKMPQTUXYZWHOSAFRID',
+                                     '1966'
+                                   ],
+             'Charles Laughton' => [
+                                     'Witness for the Prosecution',
+                                     'ITNESFORHPCUABDGJKLMQVXYZW',
+                                     '1957'
+                                   ],
+             'Linda Hamilton' => [
+                                   'The Terminator',
+                                   'GJKLPQSUVWXYZTHERMINAOBCDF',
+                                   '1984'
+                                 ],
+             'Anthony Hopkins' => [
+                                    'The Silence of the Lambs',
+                                    'RUVWXYZTHESILNCOFAMBDGJKPQ',
+                                    '1991'
+                                  ],
+             'Ingrid Bergman' => [
+                                   'Casablanca',
+                                   'DEFGHIJKMOPQRTUVWXYZCASBLN',
+                                   '1942'
+                                 ],
+             'Alec Guinness' => [
+                                  'Star Wars',
+                                  'ZSTARWBCDEFGHIJKLMNOPQUVXY',
+                                  '1977'
+                                ],
+             'Margaret Rutherford' => [
+                                        'Blithe Spirit',
+                                        'SPRACDFGJKMNOQUVWXYZBLITHE',
+                                        '1945'
+                                      ],
+             'Bill Murray' => [
+                                'Lost in Translation',
+                                'MPQUVWXYZLOSTINRABCDEFGHJK',
+                                '2003'
+                              ],
+             'Audrey Hepburn' => [
+                                   'Roman Holiday',
+                                   'YBCEFGJKPQSTUVWXZROMANHLID',
+                                   '1953'
+                                 ],
+             'Sigourney Weaver' => [
+                                     'Alien',
+                                     'OPQRSTUVWXYZALIENBCDFGHJKM',
+                                     '1979'
+                                   ],
+             'Marlene Dietrich' => [
+                                     'Witness for the Prosecution',
+                                     'ITNESFORHPCUABDGJKLMQVXYZW',
+                                     '1957'
+                                   ],
+             'Tobey Maguire' => [
+                                  'Spider-Man',
+                                  'CFGHJKLOQTUVWXYZSPIDERMANB',
+                                  '2002'
+                                ],
+             'Kevin Spacey' => [
+                                 'L.A. Confidential',
+                                 'NFIDETBGHJKMPQRSUVWXYZLACO',
+                                 '1997'
+                               ],
+             'Shirley MacLaine' => [
+                                     'The Apartment',
+                                     'FGIJKLOQSUVWXYZTHEAPRMNBCD',
+                                     '1960'
+                                   ],
+             'John Hurt' => [
+                              'Alien',
+                              'OPQRSTUVWXYZALIENBCDFGHJKM',
+                              '1979'
+                            ],
+             'Richard Burton' => [
+                                   'Who\'s Afraid of Virginia Woolf?',
+                                   'VGNLBCEJKMPQTUXYZWHOSAFRID',
+                                   '1966'
+                                 ],
+             'Mickey Rooney' => [
+                                  'Strike Up the Band',
+                                  'HBANDCFGJLMOQVWXYZSTRIKEUP',
+                                  '1940'
+                                ],
+             'Rex Harrison' => [
+                                 'Blithe Spirit',
+                                 'SPRACDFGJKMNOQUVWXYZBLITHE',
+                                 '1945'
+                               ],
+             'Lauren Bacall' => [
+                                  'Murder on the Orient Express',
+                                  'VWYZMURDEONTHIXPSABCFGJKLQ',
+                                  '1974'
+                                ],
+             'Kelly McGillis' => [
+                                   'Witness',
+                                   'FGHJKLMOPQRUVXYZWITNESABCD',
+                                   '1985'
+                                 ]
+           };

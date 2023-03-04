@@ -1,0 +1,525 @@
+#!/usr/bin/perl
+use warnings;
+use strict;
+
+use lib '../lib';
+use LetterPattern;
+
+## input
+
+@ARGV = ('cyphertext-200412');
+my $key = '';
+my (%data, @data, %cat);
+while (<>) {
+  s/[\r\n]+//g;
+  /^\s+(.+)\s*$/ and $key = lc $1, next;
+  /\S/ or next;
+  push @{$data{$key}}, $_;
+  push @data, $_;
+  $cat{$_} = $key;
+}
+$data{''} = \@data;
+
+## read first name db
+
+my @fname_files = qw( bert/english.names.first bert/misc.names.first );
+my (%fnames, %fnames_by_len);
+
+$fnames{''}    = read_prefixed_words '..',    @fname_files;
+$fnames{men}   = read_prefixed_words '[^w].', @fname_files;
+$fnames{women} = read_prefixed_words '[^m].', @fname_files;
+
+for my $cat (keys %fnames) {
+  $_ = lc $_,
+    push @{ $fnames_by_len{$cat}{length $_} }, $_
+      foreach @{ $fnames{$cat} };
+}
+
+## read full name db
+
+my @aname_files = qw( ../english/english.names ../english/misc.names
+                      bert/extra.names.last );
+my ($anames, %anames_by_len);
+
+$anames = read_words @aname_files;
+
+$_ = lc $_
+  foreach @$anames;
+#  push @{ $anames_by_len{length $_} }, $_
+
+## special cases
+
+print "names not matching '<word> <word>':\n";
+print "  $_   ($cat{$_})\n" for grep !/^[A-Z]+ [A-Z]+$/, @data;
+# <A'> is probably <d'>, or maybe <l'>.
+
+## overall frequencies
+
+print "\n";
+my (%cat_freq, %cat_freq_order);
+
+for my $cat (sort keys %data) {
+  $cat_freq{$cat}{$_}++ foreach map split(//), @{$data{$cat}};
+  my @order = sort {$cat_freq{$cat}{$b} <=> $cat_freq{$cat}{$a}}
+    keys %{$cat_freq{$cat}};
+  $cat_freq_order{$cat} = \@order;
+  my $cols = 4;
+  my $rows = int((@order + $cols - 1) / $cols);
+  printf "letter frequencies for %s (%d total chars):",
+    ($cat || 'all'), scalar @order;
+  for my $r (0..($rows-1)) {
+    for my $c (0..($cols-1)) {
+      print($c ? "   " : "\n  ");
+      my $p = $c*$rows + $r;
+      $p >= @order and next;
+      printf qq[%2d "%s"], $cat_freq{$cat}{$order[$p]}, $order[$p];
+    }
+  }
+  print "\n";
+}
+
+## numbers of delta candidates
+
+sub squote ( $ ) { $_[0] =~ "'" ? qq["$_[0]"] : qq['$_[0]']; }
+sub dquote ( $ ) { $_[0] =~ '"' ? qq['$_[0]'] : qq["$_[0]"]; }
+sub pquote ( $ ) { qq[($_[0])]; }
+sub bquote ( $ ) { qq<[$_[0]]>; }
+
+#print "\n";
+#for my $cat (sort keys %fnames_by_len) {
+#  printf "number of known first names by length, for %s:\n", ($cat || 'all');
+#  for my $len (sort {$a<=>$b} keys %{ $fnames_by_len{$cat} }) {
+#    printf "  %2d: %5s\n", $len, bquote @{ $fnames_by_len{$cat}{$len} };
+#  }
+#}
+
+## first names
+
+my (%first, %first_by_len);
+
+print "\n";
+for my $cat (sort keys %data) {
+  for my $name (@{$data{$cat}}) {
+    my ($first) = split ' ', $name;
+    push @{ $first{$cat} }, $first;
+    push @{ $first_by_len{$cat}{length $first} }, $first;
+  }
+
+  printf "first names (by length) for %s, compared w/ num. known (k):\n",
+    ($cat || 'all');
+  for my $len (sort {$a<=>$b} keys %{$first_by_len{$cat}}) {
+    printf "  %1d: k=%3s %3s", $len, scalar @{ $fnames_by_len{$cat}{$len} },
+      bquote @{ $first_by_len{$cat}{$len} };
+    print " $_" for sort @{ $first_by_len{$cat}{$len} };
+    print "\n";
+  }
+}
+
+## 'good' munged first names to attack
+
+my (%munged, %munged_score);
+
+print "\n";
+for my $cat (sort grep length, keys %first) {
+  foreach my $cyp (@{ $first{$cat} }) {
+    my @cletters = split //, $cyp;
+    my %ccount;
+    ++$ccount{$_} for @cletters;
+    $munged{$cyp} = join '',
+      sort {$ccount{$b} <=> $ccount{$a} or $a cmp $b} @cletters;
+    my $score = 0;
+    $score += ($_-.9)*($_-.9) for values %ccount;
+    $munged_score{$cyp} = $score;
+  }
+  my @order = sort {$munged_score{$b} <=> $munged_score{$a}
+		      or length $a <=> length $b
+			or $munged{$a} cmp $munged{$b}}
+    @{ $first{$cat} };
+  my $cols = 2;
+  my $rows = int((@order + $cols - 1) / $cols);
+  printf "sorted-letter first names for %s (%d total words):",
+    ($cat || 'all'), scalar @order;
+  for my $r (0..($rows-1)) {
+    for my $c (0..($cols-1)) {
+      print($c ? "   " : "\n  ");
+      my $p = $c*$rows + $r;
+      $p >= @order and next;
+      my $cyp = $order[$p];
+      my @lcyp = split //, $cyp;
+      my %ccyp;
+      ++$ccyp{$_} for @lcyp;
+      my $scy = join '', sort {$ccyp{$b} <=> $ccyp{$a} or $a cmp $b} @lcyp;
+      printf "%-15s %-17s", $scy, pquote $cyp;
+    }
+  }
+  print "\n";
+}
+
+## marginally less stupid guesswork attempt =)
+
+if (0) {
+print "\ntry a few names:\n";
+for my $T ( 'm winston churchill', 'w margaret thatcher', 'm isaac newton',
+            'm albert einstein', 'm tony blair', 'm david beckham',
+	    'm alec guinness', 'w mata hari', 'm santa claus',
+	    'm george smiley', 'm john lecarre',
+	    'm james bond', 'm ian fleming',
+	    'm gregory peck', 'm harrison ford', 'm humphrey bogart',
+	    'm sean connery', 'm roger moore' ) {
+  (my $t = $T) =~ s/^([mw]) // or die;
+  my $cat = ($1 eq 'm' ? 'men' : 'women');
+  my $m = template_find uc($t), $data{''}
+    or print("  no possibilities for '$t'\n"), next;
+  print "  possible '$t':\n";
+  printf "    %-15s %-7s\n", $_, pquote $cat{$_} for @$m;
+}
+}
+
+## generic cypher helper code
+
+{
+  package Cypher::Base;
+
+  use overload ( '&{}' => 'make_sub' );
+
+  our $AtoZ = join '', ('A'..'Z');
+  our $atoz = join '', ('a'..'z');
+
+  # creation
+
+  sub _new ( $$$ ) {
+    my ($class, $from, $to) = @_;
+    $class = ref($class) || $class;
+    length $from eq length $to
+      or die "Inconsistent input length in '$from' -> '$to'";
+    # check uniqueness in c->p mapping
+    my $check = $from;
+    eval "\$check =~ tr/$from/$to/";
+    $check eq $to or die "Inconsistent decoding '$from' -> '$to' ($check)";
+    # create
+    bless [ $from, $to ], $class;
+  }
+
+  # default creation call for "inverted" cypher
+
+  sub _inverted ( $$$ ) {
+    my ($class, $from, $to) = @_;
+    $class->new($from, $to);
+  }
+
+  # canonicalize: make $cypher small and sorted (with $plain matching)
+
+  sub _canon ( $ ) {
+    my ($self) = @_;
+    my ($from, $to) = @$self;
+    my ($dom, $rng) = ($self->_DOMAIN, $self->_RANGE);
+    # find source characters that are currently not defined
+    my $unused = $self->($dom);
+    #eval "\$unused =~ tr/$rng//d";   # NB: not actually needed by later code
+    # find source characters that are currently defined
+    my $used = $dom;
+    eval "\$used =~ tr/$unused//d";
+    # put in canonical version
+    my $mapped = $self->($used);
+    $self->[0] = $used;   $self->[1] = $mapped;
+    $self;
+  }
+
+  # create callback to apply cypher to text
+
+  sub make_sub ( $ ) {
+    my ($self) = @_;
+    my ($from, $to) = @$self;
+    eval 'sub { my ($t) = @_; $t =~ tr/'."\Q$from".'/'."\Q$to".'/; $t }';
+  }
+
+  # apply cypher to text
+  # (uses make_sub to avoid duplicating code, though it's less efficient)
+
+  sub apply ( $$ ) {
+    my ($self, $text) = @_;
+    $text = $self->make_sub->($text);
+    # remove characters that didn't make it because the cypher is incomplete
+    my $dom = $self->_DOMAIN;
+    eval "\$text =~ tr/\Q$dom\E/_/";
+    $text;
+  }
+}
+
+## decode specific cypher helper code
+
+{
+  package Cypher::Decode;
+  our @ISA = qw( Cypher::Base );
+
+  sub _DOMAIN () { $Cypher::Base::AtoZ };
+  sub _RANGE ()  { $Cypher::Base::atoz };
+
+  # creation
+
+  sub new ( $$$ ) {
+    my ($class, $cypher, $plain) = @_;
+    # enforce "correct" case
+    $cypher = uc $cypher;
+    $plain  = lc $plain;
+    # create and canonicalize
+    $class->_new($cypher, $plain)->_canon;
+  }
+
+  # invert
+
+  sub invert ( $ ) {
+    my ($self) = @_;
+    Cypher::Encode->_inverted($self->[1], $self->[0]);
+  }
+
+  # explicit encode and decode
+
+  sub decode ( $$ )  { $_[0]->apply($_[1]); }
+  sub iencode ( $$ ) { $_[0]->invert->apply($_[1]); }
+}
+
+## encode specific cypher helper code
+
+{
+  package Cypher::Encode;
+  our @ISA = qw( Cypher::Base );
+
+  sub _DOMAIN () { $Cypher::Base::atoz };
+  sub _RANGE ()  { $Cypher::Base::AtoZ };
+
+  # creation
+
+  sub new ( $$$ ) {
+    my ($class, $plain, $cypher) = @_;
+    # enforce "correct" case
+    $plain  = lc $plain;
+    $cypher = uc $cypher;
+    # create and canonicalize
+    $class->_new($plain, $cypher)->_canon;
+  }
+
+  # invert
+
+  sub invert ( $ ) {
+    my ($self) = @_;
+    Cypher::Decode->_inverted($self->[1], $self->[0]);
+  }
+
+  # explicit encode and decode
+
+  sub encode ( $$ )  { $_[0]->apply($_[1]); }
+  sub idecode ( $$ ) { $_[0]->invert->apply($_[1]); }
+}
+
+## dictionary attack on first names
+
+my @good = ( 'humphrey bogart', 'harrison ford', 'anthony hopkins',
+	     'gregory peck', 'audrey hepburn', 'elizabeth taylor',
+	   );
+
+my @match_list;
+print "\ndictionary name matches:\n";
+for my $cat (sort grep length, keys %data) {
+  my $c0 = substr $cat, 1;
+  for my $name (@{ $data{$cat} }) {
+    my ($match);
+    if (my $good = template_find $name, \@good) {
+      # If on the list of known-good names, accept immediately.
+      @$good == 1 or die;
+      $match = $good->[0];
+    } else {
+      # Otherwise, try finding the first name...
+      my ($first, $last) = split ' ', $name, 2;
+      my $f_maybe = template_find $first, $fnames{$cat}
+	or print("  no first-name matches for '$first' ($cat).\n"), next;
+      my $fm = join '|',
+	(@$f_maybe < 5 ? @$f_maybe
+	 : (@$f_maybe[0..3], "... " . bquote scalar @$f_maybe ) );
+      # ...then try finding the last name...
+      my $l_maybe = template_find $last, $anames
+	or print("  no last-name matches for '$fm $last' ($cat).\n"), next;
+      # ...then try finding first+last combos that don't conflict.
+      my @combos;
+      for my $f (@$f_maybe) {
+	push @combos, "$f $_" for @$l_maybe;
+      }
+      my $maybe = template_find $name, \@combos
+	or print("  no combined matches for '$fm $last' ($cat).\n"), next;
+      if (@$maybe > 1) {
+	if (@$maybe > 10) {
+	  print "  possible '$name' ($cat) [" . @$maybe . "] -- skipped.\n";
+	} else {
+	  print "  possible '$name' ($cat) [" . @$maybe . "]:\n";
+	  print "    $_\n" for @$maybe;
+	}
+	next;
+      }
+      $match = $maybe->[0];
+    }
+
+    # If we're here, we have a single good name match.
+    print "  match for '$name' ($cat):  $match\n";
+    push @match_list, [ $name, $match, $cat ];
+  }
+}
+
+### show match-list cyphers
+
+print "\nmatch cypher construction:\n";
+for my $m (0..$#match_list) {
+  my ($name, $match, $cat) = @{$match_list[$m]};
+  my $C = Cypher::Decode->new($name, $match);
+  use Data::Dumper;   print Dumper $C;
+}
+
+
+__END__
+########## "FAILED" TESTS: (delta stuff) ##########
+
+## show deltas
+
+sub letter_delta ( $$ ) {
+  my ($c1, $c2) = @_;
+  my $d = ord(uc $c1) - ord(uc $c2);
+  chr($d < 0 ? 123+$d : 65+$d);
+}
+
+sub word_delta ( $$ ) {
+  my ($w1, $w2) = @_;
+  join '', map letter_delta((substr $w1, $_, 1),
+			    (substr $w2, $_, 1)), 0..(length($w1)-1);
+}
+
+if (0) {
+for my $cat (sort keys %first_by_len) {
+  printf "first name deltas for %s:\n",
+    ($cat || 'all');
+  for my $len (sort {$a<=>$b} keys %{$first_by_len{$cat}}) {
+    my @names = sort @{ $first_by_len{$cat}{$len} };
+    next unless @names > 1;
+    my $text = sprintf "  %1d: ", $len;
+    for my $i (0..($#names-1)) {
+      for my $j (($i+1)..$#names) {
+	$text .= ' ' . word_delta $names[$i], $names[$j];
+	$text .= '/' . word_delta $names[$j], $names[$i];
+      }
+    }
+    use Text::Wrap;
+    print wrap('', '      ', $text), "\n";
+  }
+}
+}
+
+## stupid guesswork attempt
+
+sub text_char_delta ( $$ ) {
+  my ($c1, $c2) = @_;
+  $c1 =~ /^[a-z]$/i or return $c1;
+  $c2 =~ /^[a-z]$/i or return $c2;
+  letter_delta $c1, $c2;
+}
+
+sub text_delta ( $$ ) {
+  my ($w1, $w2) = @_;
+  join '', map text_char_delta((substr $w1, $_, 1),
+			    (substr $w2, $_, 1)), 0..(length($w1)-1);
+}
+
+if (1) {
+print "\ntry a few names:\n";
+for my $T ( 'm winston churchill', 'w margaret thatcher', 'm isaac newton',
+            'm albert einstein', 'm tony blair', 'm david beckham',
+	    'm alec guinness', 'w mata hari', 'm santa claus',
+	    'm george smiley', 'm john lecarre',
+	    'm james bond', 'm ian fleming',
+	    'm gregory peck', 'm harrison ford', 'm humphrey bogart' ) {
+  (my $t = $T) =~ s/^([mw]) // or die;
+  my $cat = ($1 eq 'm' ? 'men' : 'women');
+  (my $p = $t) =~ s/[a-z]/\[A-Z\]/g;
+  my @m = grep /^$p$/, @data
+    or print("  no possibilities for '$t'\n"), next;
+  print "  possible '$t':\n";
+  (printf("    %-15s %-7s", $_, pquote $cat{$_}),
+   ($cat eq $cat{$_}) && printf(" [d %-17s/%s]",
+				dquote(text_delta $_, $t),
+				dquote(text_delta $t, $_)),
+   print("\n")) for @m;
+
+}
+}
+
+## build delta table
+
+my %fname_deltas;
+{
+  local ($|) = 1;
+  print "\nconstructing first name deltas (slow!)...";
+  for my $cat (keys %fnames_by_len) {
+    for my $len (keys %{$fnames_by_len{$cat}}) {
+      my @names = @{ $fnames_by_len{$cat}{$len} };
+      next unless @names > 1;
+      for my $i (0..($#names-1)) {
+	for my $j (($i+1)..$#names) {
+	  my $delta = uc word_delta $names[$i], $names[$j];
+	  push @{ $fname_deltas{$cat}{$delta} },
+	    lc($names[$i]) . '/' . lc($names[$j]);
+	}
+      }
+    }
+  }
+  print " done.\n\n";
+}
+
+## try and find deltas (possibly w/ constant or rolling offset)
+
+for my $cat (sort grep length, keys %first_by_len) {
+  printf "expanding first name deltas for %s:\n",
+    ($cat || 'all');
+  for my $len (sort {$a<=>$b} keys %{$first_by_len{$cat}}) {
+    my @names = sort @{ $first_by_len{$cat}{$len} };
+    next unless @names > 1;
+    for my $i (0..($#names-1)) {
+      for my $j (($i+1)..$#names) {
+	my $d1 = uc word_delta $names[$i], $names[$j];
+	my $d2 = uc word_delta $names[$j], $names[$i];
+	{
+	  my @matches;
+	  push @matches, @{$fname_deltas{$cat}{$d1}}
+	    if $fname_deltas{$cat}{$d1};
+	  push @matches, @{$fname_deltas{$cat}{$d2}}
+	    if $fname_deltas{$cat}{$d2};
+	  @matches
+	    and print "  $names[$i]/$names[$j] -> @matches\n";
+	}
+	my $shift_by_one = ('Z' x length $d1);
+	my ($dd1, $dd2) = ($d1, $d2);
+	for my $o (1..25) {
+	  $dd1 = uc word_delta $dd1, $shift_by_one;
+	  $dd2 = uc word_delta $dd2, $shift_by_one;
+	  my @matches;
+	  push @matches, @{$fname_deltas{$cat}{$dd1}}
+	    if $fname_deltas{$cat}{$dd1};
+	  push @matches, @{$fname_deltas{$cat}{$dd2}}
+	    if $fname_deltas{$cat}{$dd2};
+	  @matches
+	    and print "  $names[$i]/$names[$j] -> @matches [offset $o]\n";
+	}
+	my ($shift_rolling, $r) = ('', 'A');
+	$shift_rolling .= $r, $r = uc letter_delta($r, 'B') for 1..length($d1);
+	($dd1, $dd2) = ($d1, $d2);
+	for my $o (1..25) {
+	  $dd1 = uc word_delta $dd1, $shift_rolling;
+	  $dd2 = uc word_delta $dd2, $shift_rolling;
+	  my @matches;
+	  push @matches, @{$fname_deltas{$cat}{$dd1}}
+	    if $fname_deltas{$cat}{$dd1};
+	  push @matches, @{$fname_deltas{$cat}{$dd2}}
+	    if $fname_deltas{$cat}{$dd2};
+	  @matches
+	    and print "  $names[$i]/$names[$j] -> @matches [rolling offset $o]\n";
+	}
+      }
+    }
+  }
+}
